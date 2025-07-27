@@ -25,7 +25,7 @@ const DashboardDropdown: React.FC<Props> = ({ selectedId, onChange }) => {
     <div className="relative inline-block">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex items-center gap-1 px-4 py-2 rounded hover:bg-gray-100"
+        className="flex items-center gap-1 px-4 py-2 rounded-2xl hover:bg-gray-100"
         aria-haspopup="listbox"
         aria-expanded={open}
         type="button"
@@ -36,7 +36,7 @@ const DashboardDropdown: React.FC<Props> = ({ selectedId, onChange }) => {
       {open && (
         <div
           role="listbox"
-          className="absolute mt-1 bg-white rounded shadow w-48 z-50"
+          className="absolute mt-1 bg-white rounded-2xl shadow w-48 z-50 overflow-hidden"
         >
           {mockDashboards.map((db) => (
             <button

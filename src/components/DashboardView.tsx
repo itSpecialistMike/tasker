@@ -11,7 +11,7 @@ type Props = {
 
 const DashboardView: React.FC<Props> = ({ dashboardId }) => {
   // Если dashboardId не передан, берем id первого дашборда
-  const activeDashboardId = dashboardId ?? mockDashboards[0]?.id ?? "";
+  const activeDashboardId = dashboardId ?? mockDashboards[1]?.id ?? "";
 
   // Фильтруем задачи по dashboardId
   const filteredTasks = useMemo(() => {

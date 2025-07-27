@@ -54,10 +54,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   };
 
   return (
-    <section className="bg-white shadow-2xl rounded-4xl p-4 md:p-6 mb-10 mx-auto max-w-6xl">
+    <section className="bg-white  border border-gray-200 shadow-2xl rounded-4xl p-4 md:p-6 mb-10 mx-auto max-w-6xl">
       <h2 className="text-xl font-bold mb-6 text-gray-800 text-center">{title}</h2>
 
-      <div className="overflow-x-auto rounded-lg">
+      <div className="overflow-x-auto rounded-lg ">
         <table className="min-w-full text-sm text-left border-collapse">
           <thead className="bg-gray-100 text-gray-600 uppercase text-xs cursor-pointer select-none">
             <tr>

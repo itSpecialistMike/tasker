@@ -54,7 +54,7 @@ const NavMobile: React.FC<Props> = ({
       </button>
 
       <Link
-        href="/profile"
+        href="/register"
         className="w-9 h-9 rounded-full bg-gray-300 flex items-center justify-center text-sm font-medium"
         onClick={onClose}
       >

@@ -17,7 +17,7 @@ const Header: React.FC<Props> = ({ selectedDashboardId, onDashboardChange }) => 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="w-full bg-white shadow-2xl px-4 sm:px-6 md:px-10 lg:px-100 py-4 flex items-center justify-between relative mb-20">
+    <header className="w-full bg-white shadow-xl border border-gray-200 px-4 sm:px-6 md:px-10 lg:px-100 py-4 flex items-center justify-between relative mb-20">
       <Logo />
 
       <NavDesktop

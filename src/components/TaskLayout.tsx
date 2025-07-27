@@ -19,7 +19,7 @@ export default function TaskLayout({ children, selectedDashboardId }: Props) {
       />
 
       <main className="flex-1 px-4 py-8 max-w-6xl mx-auto w-full ">
-        <div className="bg-white p-6 rounded-4xl shadow-2xl">
+        <div className="bg-white p-6 rounded-4xl shadow-2xl border border-gray-200">
           {children}
         </div>
       </main>
