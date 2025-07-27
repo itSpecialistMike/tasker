@@ -1,3 +1,4 @@
+// tasker/src/components/BackgroundBlur.tsx
 'use client';
 
 import React from 'react';

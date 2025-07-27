@@ -1,3 +1,4 @@
+// tasker/src/components/header.tsx
 'use client';
 
 import React, { useState } from 'react';
@@ -25,9 +26,7 @@ const Header: React.FC<Props> = ({ selectedDashboardId, onDashboardChange }) => 
       />
 
       <div className="hidden md:flex items-center space-x-4">
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-          + Задача
-        </button>
+        
         <ProfileButton />
       </div>
 

@@ -1,4 +1,3 @@
-// src/components/DashboardLayout.tsx
 "use client";
 
 import React from "react";
@@ -12,6 +11,7 @@ import {
   SortOrder,
 } from "../hooks/dashboardHooks";
 import { findUser } from "../hooks/dashboardHooks";
+import { useRouter } from "next/navigation";
 
 interface Task {
   id: string;
@@ -47,6 +47,12 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   sortOrder,
   toggleSort,
 }) => {
+  const router = useRouter();
+
+  const handleTaskClick = (taskId: string) => {
+    router.push(`/task/${taskId}`);
+  };
+
   return (
     <section className="bg-white shadow-2xl rounded-4xl p-4 md:p-6 mb-10 mx-auto max-w-6xl">
       <h2 className="text-xl font-bold mb-6 text-gray-800 text-center">{title}</h2>
@@ -87,7 +93,19 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               const status = isSortableStatus(task.status) ? task.status : null;
 
               return (
-                <tr key={task.id} className="hover:bg-gray-50 transition">
+                <tr
+                  key={task.id}
+                  className="hover:bg-gray-50 transition cursor-pointer"
+                  onClick={() => handleTaskClick(task.id)}
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      handleTaskClick(task.id);
+                    }
+                  }}
+                  role="button"
+                  aria-label={`Открыть задачу ${task.title}`}
+                >
                   <td className="px-3 py-2 md:px-4 md:py-3 font-medium text-gray-900 max-w-[150px] truncate">
                     {task.title}
                   </td>

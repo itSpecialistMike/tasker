@@ -1,3 +1,4 @@
+// tasker/src/components/HeaderParts/NavMobile.tsx
 'use client';
 
 import Link from 'next/link';
@@ -40,13 +41,13 @@ const NavMobile: React.FC<Props> = ({
         </div>
       </details>
 
-      <Link
+      {/* <Link
         href="/tasks"
         className="text-gray-700 hover:text-blue-600"
         onClick={onClose}
       >
         Мои задачи
-      </Link>
+      </Link> */}
 
       <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full text-left">
         + Задача
@@ -57,7 +58,7 @@ const NavMobile: React.FC<Props> = ({
         className="w-9 h-9 rounded-full bg-gray-300 flex items-center justify-center text-sm font-medium"
         onClick={onClose}
       >
-        :)
+        :b
       </Link>
     </div>
   );

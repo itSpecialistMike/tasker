@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { mockDashboards } from "@/mocks/dashboards";
+import { useRouter } from "next/navigation";
 
 type Props = {
   selectedId: string;
@@ -12,6 +13,13 @@ type Props = {
 const DashboardDropdown: React.FC<Props> = ({ selectedId, onChange }) => {
   const [open, setOpen] = useState(false);
   const selectedDashboard = mockDashboards.find((d) => d.id === selectedId);
+  const router = useRouter();
+
+  const handleSelect = (id: string) => {
+    onChange?.(id);
+    setOpen(false);
+    router.push(`/?dashboardId=${id}`);
+  };
 
   return (
     <div className="relative inline-block">
@@ -20,6 +28,7 @@ const DashboardDropdown: React.FC<Props> = ({ selectedId, onChange }) => {
         className="flex items-center gap-1 px-4 py-2 rounded hover:bg-gray-100"
         aria-haspopup="listbox"
         aria-expanded={open}
+        type="button"
       >
         {selectedDashboard?.name || "Выберите дашборд"} <ChevronDown size={16} />
       </button>
@@ -34,11 +43,9 @@ const DashboardDropdown: React.FC<Props> = ({ selectedId, onChange }) => {
               key={db.id}
               role="option"
               aria-selected={db.id === selectedId}
-              onClick={() => {
-                onChange?.(db.id);
-                setOpen(false);
-              }}
+              onClick={() => handleSelect(db.id)}
               className="w-full text-left px-4 py-2 hover:bg-gray-200"
+              type="button"
             >
               {db.name}
             </button>
