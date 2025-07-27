@@ -1,16 +1,27 @@
+// tasker/src/app/page.tsx
 'use client';
 
-import Header from './components/Header';
-import MainDash from './components/MainDash';
-import BackgroundBlur from './components/BackgroundBlur';
+import { useState } from 'react';
+import Header from '../components/Header';
+import DashboardView from '../components/DashboardView';
+import Footer from '../components/Footer';
+import BackgroundBlur from '../components/BackgroundBlur';
+import { mockDashboards } from '@/mocks/dashboards';
 
 export default function Home() {
-  return (
-    <main className="relative min-h-screen overflow-hidden">
-      <BackgroundBlur />
+  const [selectedDashboardId, setSelectedDashboardId] = useState(mockDashboards[0]?.id || '');
 
-      <Header />
-      <MainDash />
-    </main>
+  return (
+    <div className="relative flex flex-col min-h-screen overflow-hidden">
+      <BackgroundBlur />
+      <Header
+        selectedDashboardId={selectedDashboardId}
+        onDashboardChange={setSelectedDashboardId}
+      />
+      <main className="flex-grow">
+        <DashboardView dashboardId={selectedDashboardId} />
+      </main>
+      <Footer />
+    </div>
   );
 }

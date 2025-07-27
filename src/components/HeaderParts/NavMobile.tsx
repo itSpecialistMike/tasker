@@ -1,28 +1,41 @@
+'use client';
+
 import Link from 'next/link';
+import { mockDashboards } from '@/mocks/dashboards';
 
-const mockDashboards = [
-  { id: 1, name: 'Маркетинг' },
-  { id: 2, name: 'Разработка' },
-  { id: 3, name: 'Продажи' },
-];
+type Props = {
+  onClose: () => void;
+  selectedDashboardId: string;
+  onDashboardChange: (id: string) => void;
+};
 
-const NavMobile = ({ onClose }: { onClose: () => void }) => {
+const NavMobile: React.FC<Props> = ({
+  onClose,
+  selectedDashboardId,
+  onDashboardChange,
+}) => {
   return (
-    <div className="absolute top-16 left-0 w-full bg-white shadow-md z-10 flex flex-col items-start px-6 py-4 space-y-4 md:hidden">
-      <details className="w-full">
+    <div className="absolute top-16 left-0 w-full text-2xl bg-white shadow-md z-10 flex flex-col items-start px-6 py-4 space-y-4 md:hidden">
+      <details className="w-full" open>
         <summary className="cursor-pointer text-gray-700 hover:text-blue-600">
           Дашборды
         </summary>
         <div className="ml-4 mt-2 space-y-1">
           {mockDashboards.map((db) => (
-            <Link
+            <button
               key={db.id}
-              href={`/dashboards/${db.id}`}
-              className="block text-sm text-gray-700 hover:text-blue-600"
-              onClick={onClose}
+              className={`block text-sm text-left w-full ${
+                db.id === selectedDashboardId
+                  ? 'text-blue-600 font-semibold'
+                  : 'text-gray-700 hover:text-blue-600'
+              }`}
+              onClick={() => {
+                onDashboardChange(db.id);
+                onClose();
+              }}
             >
               {db.name}
-            </Link>
+            </button>
           ))}
         </div>
       </details>
