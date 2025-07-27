@@ -45,7 +45,7 @@ export default function Login() {
 
           <button
             type="submit"
-            className="w-full px-4 py-2 text-white rounded-4xl hover:bg-[#40739e] bg-[#353b48] transition"
+            className="w-full px-4 py-2 text-white rounded-4xl hover:bg-indigo-700 bg-indigo-900 transition"
           >
             Войти
           </button>

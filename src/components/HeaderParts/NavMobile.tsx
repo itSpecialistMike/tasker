@@ -1,8 +1,9 @@
 // tasker/src/components/HeaderParts/NavMobile.tsx
 'use client';
 
-import Link from 'next/link';
 import { mockDashboards } from '@/mocks/dashboards';
+import ProfileButton from './ProfileButton';
+import { useRouter } from 'next/navigation';
 
 type Props = {
   onClose: () => void;
@@ -15,51 +16,42 @@ const NavMobile: React.FC<Props> = ({
   selectedDashboardId,
   onDashboardChange,
 }) => {
+  const router = useRouter();
+
+  const handleDashboardSelect = (id: string) => {
+    onDashboardChange(id);
+    onClose();
+    router.push(`/?dashboardId=${id}`);
+  };
+
   return (
-    <div className="absolute top-16 left-0 w-full text-2xl bg-white shadow-md z-10 flex flex-col items-start px-6 py-4 space-y-4 md:hidden">
+    <div className="absolute top-16 left-0 w-full bg-white shadow-md z-10 flex flex-col items-start px-6 py-4 space-y-4 md:hidden">
       <details className="w-full" open>
-        <summary className="cursor-pointer text-gray-700 hover:text-blue-600">
+        <summary className="cursor-pointer text-gray-700 text-3xl">
           Дашборды
         </summary>
         <div className="ml-4 mt-2 space-y-1">
           {mockDashboards.map((db) => (
             <button
               key={db.id}
-              className={`block text-sm text-left w-full ${
+              className={`block text-left text-2xl w-full ${
                 db.id === selectedDashboardId
                   ? 'text-blue-600 font-semibold'
-                  : 'text-gray-700 hover:text-blue-600'
+                  : 'text-gray-700'
               }`}
-              onClick={() => {
-                onDashboardChange(db.id);
-                onClose();
-              }}
+              onClick={() => handleDashboardSelect(db.id)}
             >
               {db.name}
             </button>
           ))}
         </div>
       </details>
-
-      {/* <Link
-        href="/tasks"
-        className="text-gray-700 hover:text-blue-600"
-        onClick={onClose}
-      >
-        Мои задачи
-      </Link> */}
-
-      <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full text-left">
-        + Задача
-      </button>
-
-      <Link
-        href="/register"
-        className="w-9 h-9 rounded-full bg-gray-300 flex items-center justify-center text-sm font-medium"
-        onClick={onClose}
-      >
-        :b
-      </Link>
+      <div className="flex items-center justify-self-auto space-x-4 w-full">
+        <button className="bg-indigo-900 text-white text-2xl text-center px-4 py-2 rounded-2xl transition">
+          Создать задачу
+        </button>
+        <ProfileButton />
+      </div>
     </div>
   );
 };
