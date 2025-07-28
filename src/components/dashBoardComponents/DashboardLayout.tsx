@@ -1,27 +1,50 @@
 "use client";
 
+/** 
+ * Импорт библиотек:
+ * - React: для построения интерфейса
+ * - clsx: условное объединение CSS классов
+ */
 import React from "react";
 import clsx from "clsx";
+
+/** 
+ * Импорт вспомогательных функций и типов из dashboardHooks:
+ * - statusStyles, statusIcons: соответствие статуса стилю и иконке
+ * - isSortableStatus: проверка, можно ли сортировать по статусу
+ * - getSortIndicator: возврат символа сортировки (стрелка вверх/вниз)
+ */
 import {
   statusStyles,
   statusIcons,
   isSortableStatus,
   getSortIndicator,
-  SortField,
-  SortOrder,
-} from "../hooks/dashboardHooks";
-import { findUser } from "../hooks/dashboardHooks";
+} from "@/hooks/dashboardHooks";
+
+/** 
+ * Импорт функции для поиска пользователя по ID
+ */
+import { findUser } from "@/hooks/dashboardHooks";
+
+/** 
+ * Хук для навигации между страницами в Next.js
+ */
 import { useRouter } from "next/navigation";
 
-interface Task {
-  id: string;
-  title: string;
-  status: string;
-  deadline: string;
-  createdAt: string;
-  assignerId?: string | null;
-}
+/**
+ * Импорт типов из файла типов:
+ * - Task: описание задачи
+ * - SortField, SortOrder: типы для сортировки
+ */
+import type { Task, SortField, SortOrder } from "@/types/task";
 
+/**
+ * Пропсы для компонента DashboardLayout:
+ * - title: заголовок таблицы
+ * - items: массив задач
+ * - sortField, sortOrder: текущее состояние сортировки
+ * - toggleSort: функция переключения сортировки
+ */
 interface DashboardLayoutProps {
   title: string;
   items: Task[];
@@ -30,6 +53,11 @@ interface DashboardLayoutProps {
   toggleSort: (field: SortField) => void;
 }
 
+/**
+ * Компонент ClientDate:
+ * - принимает строку даты
+ * - отображает локализованную версию этой даты
+ */
 const ClientDate: React.FC<{ dateStr: string }> = ({ dateStr }) => {
   const [dateString, setDateString] = React.useState("");
 
@@ -40,6 +68,10 @@ const ClientDate: React.FC<{ dateStr: string }> = ({ dateStr }) => {
   return <>{dateString}</>;
 };
 
+/**
+ * Основной компонент DashboardLayout:
+ * - отображает таблицу задач с возможностью сортировки и перехода к деталям задачи
+ */
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   title,
   items,
@@ -49,19 +81,28 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 }) => {
   const router = useRouter();
 
+  /**
+   * Обработчик клика по строке задачи:
+   * - перенаправляет пользователя на страницу задачи
+   */
   const handleTaskClick = (taskId: string) => {
     router.push(`/task/${taskId}`);
   };
 
   return (
-    <section className="bg-white  border border-gray-200 shadow-2xl rounded-4xl p-4 md:p-6 mb-10 mx-auto max-w-6xl">
+    <section className="bg-white border border-gray-200 shadow-2xl rounded-4xl p-4 md:p-6 mb-10 mx-auto max-w-6xl">
+      {/* Заголовок таблицы */}
       <h2 className="text-xl font-bold mb-6 text-gray-800 text-center">{title}</h2>
 
       <div className="overflow-x-auto rounded-lg ">
         <table className="min-w-full text-sm text-left border-collapse">
+          {/* Шапка таблицы с заголовками колонок и иконками сортировки */}
           <thead className="bg-gray-100 text-gray-600 uppercase text-xs cursor-pointer select-none">
             <tr>
+              {/* Название задачи (не сортируемое) */}
               <th className="px-3 py-2 md:px-4 md:py-2 max-w-[150px]">Задача</th>
+
+              {/* Сортировка по статусу */}
               <th
                 className="px-3 py-2 md:px-4 md:py-2"
                 onClick={() => toggleSort("status")}
@@ -69,6 +110,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               >
                 Статус {getSortIndicator(sortField, sortOrder, "status")}
               </th>
+
+              {/* Сортировка по дедлайну (видна только на >= sm экранах) */}
               <th
                 className="hidden sm:table-cell px-3 py-2 md:px-4 md:py-2"
                 onClick={() => toggleSort("deadline")}
@@ -76,6 +119,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               >
                 Дедлайн {getSortIndicator(sortField, sortOrder, "deadline")}
               </th>
+
+              {/* Сортировка по дате создания (видна только на >= md экранах) */}
               <th
                 className="hidden md:table-cell px-3 py-2 md:px-4 md:py-2"
                 onClick={() => toggleSort("createdAt")}
@@ -83,13 +128,18 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               >
                 Создано {getSortIndicator(sortField, sortOrder, "createdAt")}
               </th>
+
+              {/* Исполнитель (виден на >= sm экранах) */}
               <th className="hidden sm:table-cell px-3 py-2 md:px-4 md:py-2 max-w-[130px]">
                 Исполнитель
               </th>
             </tr>
           </thead>
+
+          {/* Тело таблицы: список задач */}
           <tbody className="divide-y divide-gray-100">
             {items.map((task) => {
+              // Если статус задачи подходит для сортировки — используем его
               const status = isSortableStatus(task.status) ? task.status : null;
 
               return (
@@ -106,9 +156,12 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                   role="button"
                   aria-label={`Открыть задачу ${task.title}`}
                 >
+                  {/* Название задачи, обрезается при переполнении */}
                   <td className="px-3 py-2 md:px-4 md:py-3 font-medium text-gray-900 max-w-[150px] truncate">
                     {task.title}
                   </td>
+
+                  {/* Статус задачи: цвет + иконка (если статус валиден), иначе серый курсив */}
                   <td className="px-3 py-2 md:px-4 md:py-3">
                     {status ? (
                       <span
@@ -123,12 +176,18 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                       <span className="text-gray-500 italic">{task.status}</span>
                     )}
                   </td>
+
+                  {/* Дедлайн (только sm+) */}
                   <td className="hidden sm:table-cell px-3 py-2 md:px-4 md:py-3 text-gray-700 whitespace-nowrap">
                     {task.deadline}
                   </td>
+
+                  {/* Дата создания, отрисована через ClientDate (только md+) */}
                   <td className="hidden md:table-cell px-3 py-2 md:px-4 md:py-3 text-gray-700 whitespace-nowrap">
                     <ClientDate dateStr={task.createdAt} />
                   </td>
+
+                  {/* Имя исполнителя (только sm+) */}
                   <td className="hidden sm:table-cell px-3 py-2 md:px-4 md:py-3 text-gray-700 max-w-[130px] truncate">
                     {findUser(task.assignerId ?? "")}
                   </td>
@@ -142,4 +201,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   );
 };
 
+/**
+ * Экспорт компонента DashboardLayout:
+ * - используется для отображения задач в интерфейсе пользователя
+ */
 export default DashboardLayout;

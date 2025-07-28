@@ -1,3 +1,4 @@
+// tasker/src/mocks/tasks.ts
 export type TaskStatus =
   | 'to-do'
   | 'in-progress'

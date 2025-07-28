@@ -1,3 +1,4 @@
+// tasker/src/mocks/dashboards.ts
 export const mockDashboards = [
   { id: 'all', name: 'Все задачи' },
   { id: 'dash-1', name: 'Главный дашборд' },

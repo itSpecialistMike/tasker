@@ -1,9 +1,10 @@
+// tasker/src/app/page.tsx
 "use client";
 
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import Header from "../components/Header";
-import DashboardView from "../components/DashboardView";
+import DashboardView from "@/components/dashBoardComponents/DashboardView";
 import Footer from "../components/Footer";
 import { mockDashboards } from "@/mocks/dashboards";
 

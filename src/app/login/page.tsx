@@ -1,5 +1,5 @@
 // app/login/page.tsx
-import Login from '@/components/LoginForm';
+import Login from '@/components/forms/LoginForm';
 import BackgroundBlur from "@/components/BackgroundBlur";
 
 export default function LoginPage() {

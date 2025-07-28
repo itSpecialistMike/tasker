@@ -1,8 +1,9 @@
+// tasker/src/components/taskComponents/TaskLayout.tsx
 'use client';
 
-import Header from './Header';
-import Footer from './Footer';
-import BackgroundBlur from './BackgroundBlur';
+import Header from '../Header';
+import Footer from '../Footer';
+import BackgroundBlur from '../BackgroundBlur';
 
 type Props = {
   children: React.ReactNode;

@@ -1,8 +1,9 @@
+// tasker/src/app/task/[id]/page.tsx
 'use client';
 
 import { useParams } from 'next/navigation';
-import TaskDetails from '@/components/TaskDetails';
-import TaskLayout from '@/components/TaskLayout';
+import TaskDetails from '@/components/taskComponents/TaskDetails';
+import TaskLayout from '@/components/taskComponents/TaskLayout';
 import { mockTasks } from '@/mocks/tasks';
 
 export default function TaskPage() {
