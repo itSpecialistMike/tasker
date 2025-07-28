@@ -1,20 +1,21 @@
 /**
- * Импортируем:
- * - React и useMemo: для создания компонента и мемоизации вычислений
- * - DashboardLayout: компонент, отображающий таблицу задач
- * - mockTasks: список всех задач (мока)
- * - mockDashboards: список доступных дашбордов (мока)
- * - useSortedTasks: хук для сортировки задач
+ * Импортируем необходимые библиотеки и компоненты:
+ * - React и useMemo для создания компонента и оптимизации вычислений
+ * - DashboardLayout — компонент для отображения таблицы задач
+ * - mockTasks и mockDashboards — моковые данные для задач и дашбордов
+ * - useSortedTasks — пользовательский хук для сортировки задач
  */
 import React, { useMemo } from "react";
 import DashboardLayout from "./DashboardLayout";
 import { mockTasks } from "@/mocks/tasks";
 import { mockDashboards } from "@/mocks/dashboards";
-import { useSortedTasks} from "@/hooks/dashboardHooks";
+
+// Импортируем useSortedTasks из отдельного файла
+import { useSortedTasks } from "@/hooks/useSortedTasks";
 
 /**
  * Тип пропсов компонента DashboardView:
- * - dashboardId: необязательный идентификатор выбранного дашборда
+ * - dashboardId (необязательный): идентификатор выбранного дашборда
  */
 type Props = {
   dashboardId?: string;
@@ -22,47 +23,48 @@ type Props = {
 
 /**
  * Компонент DashboardView:
- * - отображает отфильтрованные и отсортированные задачи для выбранного дашборда
- * - при отсутствии dashboardId используется второй (mockDashboards[1]) по умолчанию
+ * - отображает список задач, отфильтрованных и отсортированных по выбранному дашборду
+ * - если dashboardId не передан, по умолчанию используется второй дашборд из моков
  */
 const DashboardView: React.FC<Props> = ({ dashboardId }) => {
   /**
-   * Выбор активного dashboardId:
-   * - если передан явно, используем его
-   * - иначе берём ID второго дашборда из моков
-   * - если и он не доступен, возвращаем пустую строку
+   * Выбираем активный dashboardId:
+   * - используем переданный dashboardId, если он есть
+   * - иначе используем ID второго дашборда из mockDashboards
+   * - если и он отсутствует, используем пустую строку
    */
   const activeDashboardId = dashboardId ?? mockDashboards[1]?.id ?? "";
 
   /**
-   * Мемоизированная фильтрация задач:
-   * - если передан dashboardId === 'all', возвращаем все задачи
-   * - иначе фильтруем задачи по текущему дашборду
+   * Мемоизированный фильтр задач:
+   * - если dashboardId === "all", возвращаем все задачи без фильтрации
+   * - иначе фильтруем задачи по полю dashboardId, чтобы показать задачи только выбранного дашборда
+   * - useMemo гарантирует пересчёт только при изменении dashboardId или activeDashboardId
    */
   const filteredTasks = useMemo(() => {
-    if (dashboardId === 'all') return mockTasks;
+    if (dashboardId === "all") return mockTasks;
     return mockTasks.filter((task) => task.dashboardId === activeDashboardId);
   }, [dashboardId, activeDashboardId]);
 
   /**
-   * Хук сортировки:
-   * - возвращает отсортированные задачи, активное поле сортировки и направление
-   * - также предоставляет функцию toggleSort для изменения порядка сортировки
+   * Хук useSortedTasks:
+   * - принимает отфильтрованные задачи
+   * - возвращает отсортированный список задач,
+   *   а также параметры текущей сортировки и функцию для переключения сортировки
    */
   const { sortedTasks, sortField, sortOrder, toggleSort } = useSortedTasks(filteredTasks);
 
   /**
-   * Определяем заголовок таблицы:
-   * - ищем имя активного дашборда по его ID
-   * - если не найден, используем дефолтное название "Дашборд"
+   * Заголовок дашборда:
+   * - ищем в mockDashboards дашборд с текущим activeDashboardId
+   * - если не найден, показываем дефолтное название "Дашборд"
    */
   const title = mockDashboards.find((d) => d.id === activeDashboardId)?.name ?? "Дашборд";
 
   /**
-   * Отображаем компонент DashboardLayout с нужными данными:
-   * - title: название текущего дашборда
-   * - items: отсортированные задачи
-   * - sortField, sortOrder, toggleSort: параметры и функция сортировки
+   * Рендер компонента DashboardLayout:
+   * - передаём название дашборда, отсортированные задачи
+   * - также передаём параметры сортировки и функцию переключения
    */
   return (
     <DashboardLayout
@@ -76,7 +78,6 @@ const DashboardView: React.FC<Props> = ({ dashboardId }) => {
 };
 
 /**
- * Экспорт компонента DashboardView:
- * - используется для отображения задач в рамках одного дашборда
+ * Экспортируем DashboardView для использования в приложении
  */
 export default DashboardView;
