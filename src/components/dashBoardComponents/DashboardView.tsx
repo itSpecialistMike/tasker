@@ -2,16 +2,15 @@
  * Импортируем необходимые библиотеки и компоненты:
  * - React и useMemo для создания компонента и оптимизации вычислений
  * - DashboardLayout — компонент для отображения таблицы задач
- * - mockTasks и mockDashboards — моковые данные для задач и дашбордов
+ * - useTasks — хук получения задач с API
+ * - mockDashboards — моковые данные для дашбордов (пока настоящих нет)
  * - useSortedTasks — пользовательский хук для сортировки задач
  */
 import React, { useMemo } from "react";
 import DashboardLayout from "./DashboardLayout";
-import { mockTasks } from "@/mocks/tasks";
 import { mockDashboards } from "@/mocks/dashboards";
-
-// Импортируем useSortedTasks из отдельного файла
-import { useSortedTasks } from "@/hooks/useSortedTasks";
+import { useTasks } from "@/hooks/useTasks"; // Новый хук
+import { useSortedTasks } from "@/hooks/useSortedTasks"; // Хук сортировки
 
 /**
  * Тип пропсов компонента DashboardView:
@@ -28,6 +27,14 @@ type Props = {
  */
 const DashboardView: React.FC<Props> = ({ dashboardId }) => {
   /**
+   * Загружаем задачи с сервера:
+   * - tasks — массив задач
+   * - loading — индикатор загрузки
+   * - error — сообщение об ошибке (если есть)
+   */
+  const { tasks, loading, error } = useTasks();
+
+  /**
    * Выбираем активный dashboardId:
    * - используем переданный dashboardId, если он есть
    * - иначе используем ID второго дашборда из mockDashboards
@@ -39,12 +46,12 @@ const DashboardView: React.FC<Props> = ({ dashboardId }) => {
    * Мемоизированный фильтр задач:
    * - если dashboardId === "all", возвращаем все задачи без фильтрации
    * - иначе фильтруем задачи по полю dashboardId, чтобы показать задачи только выбранного дашборда
-   * - useMemo гарантирует пересчёт только при изменении dashboardId или activeDashboardId
+   * - useMemo гарантирует пересчёт только при изменении dashboardId, activeDashboardId или tasks
    */
   const filteredTasks = useMemo(() => {
-    if (dashboardId === "all") return mockTasks;
-    return mockTasks.filter((task) => task.dashboardId === activeDashboardId);
-  }, [dashboardId, activeDashboardId]);
+    if (dashboardId === "all") return tasks;
+    return tasks.filter((task) => task.dashboardId === activeDashboardId);
+  }, [dashboardId, activeDashboardId, tasks]);
 
   /**
    * Хук useSortedTasks:
@@ -60,6 +67,14 @@ const DashboardView: React.FC<Props> = ({ dashboardId }) => {
    * - если не найден, показываем дефолтное название "Дашборд"
    */
   const title = mockDashboards.find((d) => d.id === activeDashboardId)?.name ?? "Дашборд";
+
+  /**
+   * Обработка состояний загрузки и ошибок:
+   * - показываем сообщение при загрузке
+   * - либо ошибку, если что-то пошло не так
+   */
+  if (loading) return <div className="p-4 text-gray-500">Загрузка задач...</div>;
+  if (error) return <div className="p-4 text-red-500">Ошибка: {error}</div>;
 
   /**
    * Рендер компонента DashboardLayout:
