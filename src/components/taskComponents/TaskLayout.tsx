@@ -1,10 +1,10 @@
 // tasker/src/components/taskComponents/TaskLayout.tsx
 // Этот файл содержит компонент TaskLayout, который используется для обертки страниц задач в приложении Tasker
-'use client';
+"use client";
 
-import Header from '../Header';
-import Footer from '../Footer';
-import BackgroundBlur from '../BackgroundBlur';
+import Header from "../Header";
+import Footer from "../Footer";
+import BackgroundBlur from "../BackgroundBlur";
 
 type Props = {
   children: React.ReactNode;
@@ -14,7 +14,7 @@ type Props = {
 export default function TaskLayout({ children, selectedDashboardId }: Props) {
   return (
     <div className="flex flex-col min-h-screen">
-        <BackgroundBlur />
+      <BackgroundBlur />
       <Header
         selectedDashboardId={selectedDashboardId}
         onDashboardChange={() => {}} // Можно либо передать пустую функцию, либо реализовать смену

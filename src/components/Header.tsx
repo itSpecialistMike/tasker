@@ -1,6 +1,6 @@
 // tasker/src/components/header.tsx
 // Этот файл содержит компонент Header для приложения Tasker
-'use client';
+"use client";
 
 /**
  * Импорт React и состояний, иконок, и внутренних компонентов шапки:
@@ -9,12 +9,12 @@
  * - NavMobile: навигация для мобилок
  * - ProfileButton: кнопка профиля пользователя
  */
-import React, { useState } from 'react';
-import { Menu, X } from 'lucide-react';
-import Logo from './HeaderParts/Logo';
-import NavDesktop from './HeaderParts/NavDesktop';
-import NavMobile from './HeaderParts/NavMobile';
-import ProfileButton from './HeaderParts/ProfileButton';
+import React, { useState } from "react";
+import { Menu, X } from "lucide-react";
+import Logo from "./HeaderParts/Logo";
+import NavDesktop from "./HeaderParts/NavDesktop";
+import NavMobile from "./HeaderParts/NavMobile";
+import ProfileButton from "./HeaderParts/ProfileButton";
 
 /**
  * Пропсы Header:
@@ -31,7 +31,10 @@ type Props = {
  * - Отображает логотип, навигацию, кнопку профиля
  * - Поддерживает переключение мобильного меню
  */
-const Header: React.FC<Props> = ({ selectedDashboardId, onDashboardChange }) => {
+const Header: React.FC<Props> = ({
+  selectedDashboardId,
+  onDashboardChange,
+}) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (

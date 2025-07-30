@@ -62,21 +62,24 @@ const DashboardView: React.FC<Props> = ({ dashboardId }) => {
    * - возвращает отсортированный список задач,
    *   а также параметры текущей сортировки и функцию для переключения сортировки
    */
-  const { sortedTasks, sortField, sortOrder, toggleSort } = useSortedTasks(filteredTasks);
+  const { sortedTasks, sortField, sortOrder, toggleSort } =
+    useSortedTasks(filteredTasks);
 
   /**
    * Заголовок дашборда:
    * - ищем в mockDashboards дашборд с текущим activeDashboardId
    * - если не найден, показываем дефолтное название "Дашборд"
    */
-  const title = mockDashboards.find((d) => d.id === activeDashboardId)?.name ?? "Дашборд";
+  const title =
+    mockDashboards.find((d) => d.id === activeDashboardId)?.name ?? "Дашборд";
 
   /**
    * Обработка состояний загрузки и ошибок:
    * - показываем сообщение при загрузке
    * - либо ошибку, если что-то пошло не так
    */
-  if (loading) return <div className="p-4 text-gray-500">Загрузка задач...</div>;
+  if (loading)
+    return <div className="p-4 text-gray-500">Загрузка задач...</div>;
   if (error) return <div className="p-4 text-red-500">Ошибка: {error}</div>;
 
   /**

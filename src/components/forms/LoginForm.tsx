@@ -1,6 +1,6 @@
 // tasker/src/components/forms/LoginForm.tsx
 // Этот файл содержит компонент формы входа в приложение Tasker
-'use client';
+"use client";
 
 /**
  * Импортируем зависимости:
@@ -10,11 +10,11 @@
  * - useRouter — навигация из Next.js
  * - useState — для локального состояния ошибки
  */
-import { useForm, SubmitHandler } from 'react-hook-form';
-import Link from 'next/link';
-import { useLogin } from '@/hooks/useLogin';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useForm, SubmitHandler } from "react-hook-form";
+import Link from "next/link";
+import { useLogin } from "@/hooks/useLogin";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 /**
  * Описание формы входа.
@@ -35,7 +35,11 @@ type LoginFormInputs = {
  */
 export default function Login() {
   // Инициализация формы
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormInputs>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormInputs>();
 
   // Кастомный хук авторизации
   const { loginUser, error: serverError, loading } = useLogin();
@@ -59,9 +63,9 @@ export default function Login() {
     });
 
     if (result?.success) {
-      router.push('/');
+      router.push("/");
     } else {
-      setLocalError('Неверный логин или пароль');
+      setLocalError("Неверный логин или пароль");
     }
   };
 
@@ -72,7 +76,9 @@ export default function Login() {
 
         {/* Вывод ошибки — либо с сервера, либо локальной */}
         {(serverError || localError) && (
-          <p className="text-red-600 text-center mb-4">{serverError || localError}</p>
+          <p className="text-red-600 text-center mb-4">
+            {serverError || localError}
+          </p>
         )}
 
         {/* Форма входа */}
@@ -85,10 +91,12 @@ export default function Login() {
           <input
             type="text"
             placeholder="Логин"
-            className={`w-full p-3 mb-4 border rounded-2xl ${errors.login ? 'border-red-500' : 'border-gray-300'}`}
-            {...register('login', {
-              required: 'Логин обязателен',
-              minLength: { value: 3, message: 'Минимум 3 символа' },
+            className={`w-full p-3 mb-4 border rounded-2xl ${
+              errors.login ? "border-red-500" : "border-gray-300"
+            }`}
+            {...register("login", {
+              required: "Логин обязателен",
+              minLength: { value: 3, message: "Минимум 3 символа" },
             })}
           />
           {errors.login && (
@@ -103,17 +111,21 @@ export default function Login() {
           <input
             type="password"
             placeholder="Пароль"
-            className={`w-full p-3 mb-6 border rounded-2xl ${errors.password ? 'border-red-500' : 'border-gray-300'}`}
-            {...register('password', {
-              required: 'Пароль обязателен',
+            className={`w-full p-3 mb-6 border rounded-2xl ${
+              errors.password ? "border-red-500" : "border-gray-300"
+            }`}
+            {...register("password", {
+              required: "Пароль обязателен",
               minLength: {
                 value: 6,
-                message: 'Минимум 6 символов',
+                message: "Минимум 6 символов",
               },
             })}
           />
           {errors.password && (
-            <p className="text-red-500 text-sm mb-2">{errors.password.message}</p>
+            <p className="text-red-500 text-sm mb-2">
+              {errors.password.message}
+            </p>
           )}
 
           {/**
@@ -125,7 +137,7 @@ export default function Login() {
             disabled={loading}
             className="w-full px-4 py-2 text-white rounded-4xl hover:bg-indigo-700 bg-indigo-900 transition"
           >
-            {loading ? 'Вход...' : 'Войти'}
+            {loading ? "Вход..." : "Войти"}
           </button>
         </form>
 
@@ -133,7 +145,7 @@ export default function Login() {
          * Ссылка на регистрацию
          */}
         <p className="mt-4 text-center text-sm">
-          Нет аккаунта?{' '}
+          Нет аккаунта?{" "}
           <Link href="/register" className="text-blue-600 hover:underline">
             Зарегистрироваться
           </Link>

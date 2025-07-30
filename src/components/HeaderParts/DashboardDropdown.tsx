@@ -33,13 +33,13 @@ type Props = {
  * - Обновляет состояние и навигацию при выборе
  */
 const DashboardDropdown: React.FC<Props> = ({ selectedId, onChange }) => {
-  /** 
-   * Состояние открытия выпадающего списка 
+  /**
+   * Состояние открытия выпадающего списка
    */
   const [open, setOpen] = useState(false);
 
-  /** 
-   * Получаем выбранный дашборд из моков по ID 
+  /**
+   * Получаем выбранный дашборд из моков по ID
    */
   const selectedDashboard = mockDashboards.find((d) => d.id === selectedId);
 
@@ -75,7 +75,8 @@ const DashboardDropdown: React.FC<Props> = ({ selectedId, onChange }) => {
         type="button"
       >
         {/** Отображение названия текущего дашборда или placeholder */}
-        {selectedDashboard?.name || "Выберите дашборд"} <ChevronDown size={16} />
+        {selectedDashboard?.name || "Выберите дашборд"}{" "}
+        <ChevronDown size={16} />
       </button>
 
       {/** Анимированное выпадающее меню */}

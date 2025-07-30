@@ -79,14 +79,18 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   return (
     <section className="bg-white border border-gray-200 shadow-2xl rounded-4xl p-4 md:p-6 mb-10 mx-auto max-w-6xl">
       {/* Заголовок таблицы */}
-      <h2 className="text-xl font-bold mb-6 text-gray-800 text-center">{title}</h2>
+      <h2 className="text-xl font-bold mb-6 text-gray-800 text-center">
+        {title}
+      </h2>
 
       <div className="overflow-x-auto rounded-lg">
         <table className="min-w-full text-sm text-left border-collapse">
           {/* Заголовок с названиями колонок и сортировкой */}
           <thead className="bg-gray-100 text-gray-600 uppercase text-xs cursor-pointer select-none">
             <tr>
-              <th className="px-3 py-2 md:px-4 md:py-2 max-w-[150px]">Задача</th>
+              <th className="px-3 py-2 md:px-4 md:py-2 max-w-[150px]">
+                Задача
+              </th>
 
               <th
                 className="px-3 py-2 md:px-4 md:py-2"
@@ -155,7 +159,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                         {statusIcons[status]} {status}
                       </span>
                     ) : (
-                      <span className="text-gray-500 italic">{task.status}</span>
+                      <span className="text-gray-500 italic">
+                        {task.status}
+                      </span>
                     )}
                   </td>
 

@@ -67,33 +67,39 @@ export default function TaskDetails({ taskId }: Props) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-600">
         <div>
-          <span className="font-medium">Статус:</span> {statusLabels[task.status]}
+          <span className="font-medium">Статус:</span>{" "}
+          {statusLabels[task.status]}
         </div>
         <div>
           <span className="font-medium">Согласование:</span>{" "}
           {approveLabels[task.approveStatus]}
         </div>
         <div>
-          <span className="font-medium">Создана:</span> {formatDate(task.createdAt)}
+          <span className="font-medium">Создана:</span>{" "}
+          {formatDate(task.createdAt)}
         </div>
         <div>
-          <span className="font-medium">Дедлайн:</span> {formatDate(task.deadline)}
+          <span className="font-medium">Дедлайн:</span>{" "}
+          {formatDate(task.deadline)}
         </div>
         {task.startedAt && (
           <div>
-            <span className="font-medium">Начата:</span> {formatDate(task.startedAt)}
+            <span className="font-medium">Начата:</span>{" "}
+            {formatDate(task.startedAt)}
           </div>
         )}
         {task.completedAt && (
           <div>
-            <span className="font-medium">Завершена:</span> {formatDate(task.completedAt)}
+            <span className="font-medium">Завершена:</span>{" "}
+            {formatDate(task.completedAt)}
           </div>
         )}
       </div>
 
       {task.blockedBy.length > 0 && (
         <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
-          Задача заблокирована задачами: <strong>{task.blockedBy.join(", ")}</strong>
+          Задача заблокирована задачами:{" "}
+          <strong>{task.blockedBy.join(", ")}</strong>
         </div>
       )}
     </div>

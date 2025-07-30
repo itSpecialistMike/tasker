@@ -1,6 +1,6 @@
 // tasker/src/components/HeaderParts/NavMobile.tsx
 // Этот файл содержит компонент NavMobile для мобильной навигации в приложении Tasker
-'use client';
+"use client";
 
 /**
  * Импортируем:
@@ -8,9 +8,9 @@
  * - ProfileButton: кнопка профиля (например, для выхода/настроек)
  * - useRouter: навигация от next/navigation
  */
-import { mockDashboards } from '@/mocks/dashboards';
-import ProfileButton from './ProfileButton';
-import { useRouter } from 'next/navigation';
+import { mockDashboards } from "@/mocks/dashboards";
+import ProfileButton from "./ProfileButton";
+import { useRouter } from "next/navigation";
 
 /**
  * Тип пропсов для NavMobile:
@@ -57,7 +57,6 @@ const NavMobile: React.FC<Props> = ({
      * - содержит список дашбордов и нижнюю панель действий
      */
     <div className="absolute top-16 left-0 w-full bg-white shadow-md z-10 flex flex-col items-start px-6 py-4 space-y-4 md:hidden">
-
       {/** Секция со списком дашбордов — разворачиваемая (details/summary) */}
       <details className="w-full" open>
         <summary className="cursor-pointer text-gray-700 text-3xl">
@@ -69,8 +68,8 @@ const NavMobile: React.FC<Props> = ({
               key={db.id}
               className={`block text-left text-2xl w-full ${
                 db.id === selectedDashboardId
-                  ? 'text-blue-600 font-semibold'
-                  : 'text-gray-700'
+                  ? "text-blue-600 font-semibold"
+                  : "text-gray-700"
               }`}
               onClick={() => handleDashboardSelect(db.id)}
             >
