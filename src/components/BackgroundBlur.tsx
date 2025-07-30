@@ -1,4 +1,5 @@
 // tasker/src/components/BackgroundBlur.tsx
+// Этот файл содержит компонент для создания фонового размытия в приложении Tasker
 'use client';
 
 import React from 'react';

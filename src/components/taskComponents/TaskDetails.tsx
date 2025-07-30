@@ -1,3 +1,6 @@
+// tasker/src/components/taskComponents/TaskDetails.tsx
+// Этот файл содержит компонент TaskDetails, который отображает детали задачи в приложении Tasker
+
 "use client";
 
 import { useMemo } from "react";

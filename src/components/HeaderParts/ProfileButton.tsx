@@ -1,4 +1,5 @@
 // tasker/src/components/HeaderParts/ProfileButton.tsx
+// Этот файл содержит компонент ProfileButton, который отображает кнопку профиля пользователя в приложении Tasker
 import Link from 'next/link';
 
 const ProfileButton = () => (

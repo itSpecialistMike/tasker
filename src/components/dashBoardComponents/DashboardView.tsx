@@ -1,3 +1,6 @@
+// tasker/src/components/dashBoardComponents/DashboardView.tsx
+// Этот файл содержит компонент DashboardView, который отображает список задач в приложении Tasker
+
 /**
  * Импортируем необходимые библиотеки и компоненты:
  * - React и useMemo для создания компонента и оптимизации вычислений

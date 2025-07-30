@@ -1,4 +1,5 @@
 // tasker/src/components/HeaderParts/NavDesktop.tsx
+// Этот файл содержит компонент NavDesktop, который отображает навигационное меню в десктопной версии приложения Tasker
 
 /**
  * Импортируем:

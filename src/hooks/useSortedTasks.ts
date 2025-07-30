@@ -1,4 +1,5 @@
 // tasker/src/hooks/useSortedTasks.ts
+// Этот файл содержит хук для сортировки задач с переключением сортировки по полям и направлению
 import { useState, useMemo } from "react";
 import type { Task, SortField, SortOrder, SortableStatus } from "../types/task";
 import { statusOrder, isSortableStatus } from "./statusUtils";

@@ -1,3 +1,6 @@
+// tasker/src/components/dashBoardComponents/DashboardLayout.tsx
+// Этот файл содержит компонент DashboardLayout, который отображает таблицу задач в приложении Tasker
+
 "use client";
 
 import React from "react";

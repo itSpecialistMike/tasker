@@ -1,4 +1,5 @@
 // src/types/task.ts
+// этот файл содержит типы для задач в приложении Tasker
 export interface Task {
   id: string;
   title: string;

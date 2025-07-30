@@ -1,4 +1,5 @@
 // tasker/src/mocks/dashboards.ts
+// этот файл содержит моковые данные для дашбордов в приложении Tasker
 export const mockDashboards = [
   { id: 'all', name: 'Все задачи' },
   { id: 'dash-1', name: 'Главный дашборд' },

@@ -1,5 +1,5 @@
 // tasker/src/components/Footer.tsx
-
+// Этот файл содержит компонент Footer для приложения Tasker
 export default function Footer() {
   return (
     <footer className="bg-white  border border-gray-200">

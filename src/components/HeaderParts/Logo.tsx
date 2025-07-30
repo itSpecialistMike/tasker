@@ -1,4 +1,5 @@
 // tasker/src/components/HeaderParts/Logo.tsx
+// Этот файл содержит компонент Logo, который отображает логотип приложения Tasker
 import Link from 'next/link';
 
 const Logo = () => (

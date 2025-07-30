@@ -1,4 +1,5 @@
 // tasker/src/components/HeaderParts/NavMobile.tsx
+// Этот файл содержит компонент NavMobile для мобильной навигации в приложении Tasker
 'use client';
 
 /**

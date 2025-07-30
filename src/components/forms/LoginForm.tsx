@@ -1,9 +1,14 @@
+// tasker/src/components/forms/LoginForm.tsx
+// Этот файл содержит компонент формы входа в приложение Tasker
 'use client';
 
 /**
  * Импортируем зависимости:
  * - useForm и SubmitHandler из react-hook-form: для обработки формы и валидации
  * - Link из next/link: для навигации без перезагрузки страницы
+ * - useLogin — кастомный хук для авторизации
+ * - useRouter — навигация из Next.js
+ * - useState — для локального состояния ошибки
  */
 import { useForm, SubmitHandler } from 'react-hook-form';
 import Link from 'next/link';
@@ -12,9 +17,10 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 /**
- * Тип данных, которые ожидает форма входа:
- * - login: строка
- * - password: строка
+ * Описание формы входа.
+ * Содержит два обязательных поля:
+ * - login: строка (имя пользователя)
+ * - password: строка (пароль)
  */
 type LoginFormInputs = {
   login: string;
@@ -23,19 +29,28 @@ type LoginFormInputs = {
 
 /**
  * Компонент Login:
- * - отображает форму авторизации с валидацией
- * - использует react-hook-form для управления формой
+ * - отображает форму авторизации
+ * - выполняет валидацию с помощью react-hook-form
+ * - вызывает loginUser и перенаправляет при успехе
  */
 export default function Login() {
+  // Инициализация формы
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormInputs>();
+
+  // Кастомный хук авторизации
   const { loginUser, error: serverError, loading } = useLogin();
+
+  // Навигация
   const router = useRouter();
+
+  // Локальная ошибка при неверных данных
   const [localError, setLocalError] = useState<string | null>(null);
 
   /**
    * Обработчик отправки формы:
-   * - получает данные формы в виде объекта
-   * - отправляет login и password на сервер
+   * - вызывает loginUser с данными
+   * - при успехе — редирект на главную
+   * - при ошибке — отображается сообщение
    */
   const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
     const result = await loginUser({
@@ -55,12 +70,18 @@ export default function Login() {
       <div className="bg-white p-8 rounded-4xl md:shadow-2xl w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-center">Авторизация</h2>
 
+        {/* Вывод ошибки — либо с сервера, либо локальной */}
         {(serverError || localError) && (
           <p className="text-red-600 text-center mb-4">{serverError || localError}</p>
         )}
 
+        {/* Форма входа */}
         <form onSubmit={handleSubmit(onSubmit)}>
-          {/* Поле Login */}
+          {/**
+           * Поле "Логин"
+           * - обязательно для заполнения
+           * - минимум 3 символа
+           */}
           <input
             type="text"
             placeholder="Логин"
@@ -74,7 +95,11 @@ export default function Login() {
             <p className="text-red-500 text-sm mb-2">{errors.login.message}</p>
           )}
 
-          {/* Поле Пароль */}
+          {/**
+           * Поле "Пароль"
+           * - обязательно для заполнения
+           * - минимум 6 символов
+           */}
           <input
             type="password"
             placeholder="Пароль"
@@ -91,6 +116,10 @@ export default function Login() {
             <p className="text-red-500 text-sm mb-2">{errors.password.message}</p>
           )}
 
+          {/**
+           * Кнопка отправки формы
+           * - дизейблится во время загрузки
+           */}
           <button
             type="submit"
             disabled={loading}
@@ -100,6 +129,9 @@ export default function Login() {
           </button>
         </form>
 
+        {/**
+         * Ссылка на регистрацию
+         */}
         <p className="mt-4 text-center text-sm">
           Нет аккаунта?{' '}
           <Link href="/register" className="text-blue-600 hover:underline">
@@ -109,6 +141,9 @@ export default function Login() {
 
         <hr className="my-6 border-gray-200 sm:mx-auto" />
 
+        {/**
+         * Ссылка на главную страницу
+         */}
         <p className="mt-2 text-center text-sm">
           <Link href="/" className="text-blue-600 hover:underline">
             Вернуться на главную

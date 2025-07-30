@@ -1,4 +1,5 @@
 // tasker/src/components/header.tsx
+// Этот файл содержит компонент Header для приложения Tasker
 'use client';
 
 /**

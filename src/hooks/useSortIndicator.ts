@@ -1,3 +1,6 @@
+// tasker/src/hooks/useSortIndicator.ts
+// Этот файл содержит функцию для получения индикатора сортировки
+
 import type { SortField, SortOrder } from "../types/task";
 
 /**

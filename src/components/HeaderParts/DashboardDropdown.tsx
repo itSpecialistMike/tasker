@@ -1,4 +1,5 @@
 // tasker/src/components/HeaderParts/DashboardDropdown.tsx
+// Этот файл содержит компонент DashboardDropdown, который позволяет пользователю выбирать дашборд в приложении Tasker
 "use client";
 
 /**

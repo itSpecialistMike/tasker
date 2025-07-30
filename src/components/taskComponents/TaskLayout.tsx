@@ -1,4 +1,5 @@
 // tasker/src/components/taskComponents/TaskLayout.tsx
+// Этот файл содержит компонент TaskLayout, который используется для обертки страниц задач в приложении Tasker
 'use client';
 
 import Header from '../Header';
