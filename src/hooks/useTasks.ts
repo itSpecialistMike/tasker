@@ -1,22 +1,21 @@
-// src/hooks/useTasks.ts
-import { useEffect, useState } from "react";
-import axios from "axios";
-import type { Task } from "@/types/task";
+import { useState, useEffect } from 'react';
+import API from '@/lib/axios';
 
 export const useTasks = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<null | string>(null);
+  const [tasks, setTasks] = useState([]);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchTasks = async () => {
+      setLoading(true);
+      setError(null);
+
       try {
-        setLoading(true);
-        const res = await axios.get<Task[]>(`${process.env.NEXT_PUBLIC_API_URL}/tasklist`);
-        setTasks(res.data);
-      } catch (err) {
-        console.error("Ошибка при загрузке задач", err);
-        setError("Не удалось загрузить задачи");
+        const response = await API.get('/tasklist'); // токен в заголовке автоматом
+        setTasks(response.data);
+      } catch {
+        setError('Ошибка загрузки задач');
       } finally {
         setLoading(false);
       }
@@ -25,5 +24,5 @@ export const useTasks = () => {
     fetchTasks();
   }, []);
 
-  return { tasks, loading, error };
+  return { tasks, error, loading };
 };

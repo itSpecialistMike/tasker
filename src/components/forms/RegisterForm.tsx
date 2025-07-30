@@ -1,21 +1,29 @@
-// tasker/src/components/forms/RegisterForm.tsx
 'use client';
 
 import { useForm, SubmitHandler } from 'react-hook-form';
 import Link from 'next/link';
+import { useRegister } from '@/hooks/useRegister';
+import { useRouter } from 'next/navigation';
 
 type RegisterFormInputs = {
   name: string;
-  email: string;
+  surname: string;
+  login: string;
+  roleID: number;
   password: string;
 };
 
-export default function Register() {
+export default function RegisterForm() {
+  const router = useRouter();
   const { register, handleSubmit, formState: { errors } } = useForm<RegisterFormInputs>();
+  const { registerUser, error: serverError, loading } = useRegister();
 
-  const onSubmit: SubmitHandler<RegisterFormInputs> = data => {
-    // Логика отправки данных регистрации на сервер
-    console.log('Register data:', data);
+  const onSubmit: SubmitHandler<RegisterFormInputs> = async (data) => {
+    const result = await registerUser({ ...data, roleID: Number(data.roleID) });
+    if (result && result.id) {
+      console.log('Регистрация прошла успешно, ID:', result.id);
+      router.push('/login');
+    }
   };
 
   return (
@@ -23,42 +31,60 @@ export default function Register() {
       <div className="bg-white p-8 rounded-4xl shadow-2xl w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-center">Регистрация</h2>
 
+        {serverError && (
+          <p className="text-red-600 text-center mb-4">{serverError}</p>
+        )}
+
         <form onSubmit={handleSubmit(onSubmit)}>
           <input
             type="text"
-            placeholder="Name"
+            placeholder="Имя"
             className={`w-full p-3 mb-4 border rounded-2xl ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
             {...register('name', { required: 'Имя обязательно' })}
           />
           {errors.name && <p className="text-red-500 text-sm mb-2">{errors.name.message}</p>}
 
           <input
-            type="email"
-            placeholder="Email"
-            className={`w-full p-3 mb-4 border rounded-2xl ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
-            {...register('email', { 
-              required: 'Email обязателен', 
-              pattern: { value: /^\S+@\S+$/i, message: 'Неверный формат email' } 
-            })}
+            type="text"
+            placeholder="Фамилия"
+            className={`w-full p-3 mb-4 border rounded-2xl ${errors.surname ? 'border-red-500' : 'border-gray-300'}`}
+            {...register('surname', { required: 'Фамилия обязательна' })}
           />
-          {errors.email && <p className="text-red-500 text-sm mb-2">{errors.email.message}</p>}
+          {errors.surname && <p className="text-red-500 text-sm mb-2">{errors.surname.message}</p>}
+
+          <input
+            type="text"
+            placeholder="Логин"
+            className={`w-full p-3 mb-4 border rounded-2xl ${errors.login ? 'border-red-500' : 'border-gray-300'}`}
+            {...register('login', { required: 'Логин обязателен' })}
+          />
+          {errors.login && <p className="text-red-500 text-sm mb-2">{errors.login.message}</p>}
+
+          <input
+            type="number"
+            placeholder="ID роли (например, 1)"
+            className={`w-full p-3 mb-4 border rounded-2xl ${errors.roleID ? 'border-red-500' : 'border-gray-300'}`}
+            {...register('roleID', { required: 'roleID обязателен', valueAsNumber: true })}
+          />
+          {errors.roleID && <p className="text-red-500 text-sm mb-2">{errors.roleID.message}</p>}
 
           <input
             type="password"
-            placeholder="Password"
+            placeholder="Пароль"
             className={`w-full p-3 mb-6 border rounded-2xl ${errors.password ? 'border-red-500' : 'border-gray-300'}`}
-            {...register('password', { 
-              required: 'Пароль обязателен', 
-              minLength: { value: 6, message: 'Минимум 6 символов' } 
+            {...register('password', {
+              required: 'Пароль обязателен',
+              minLength: { value: 6, message: 'Минимум 6 символов' },
             })}
           />
           {errors.password && <p className="text-red-500 text-sm mb-2">{errors.password.message}</p>}
 
           <button
             type="submit"
-            className="w-full px-4 py-3 text-white rounded-4xl hover:bg-indigo-700 bg-indigo-900 transition"
+            disabled={loading}
+            className="w-full px-4 py-3 text-white rounded-4xl bg-indigo-900 hover:bg-indigo-700 transition"
           >
-            Отправить
+            {loading ? 'Отправка...' : 'Зарегистрироваться'}
           </button>
         </form>
 
@@ -66,14 +92,6 @@ export default function Register() {
           Уже есть аккаунт?{' '}
           <Link href="/login" className="text-blue-600 hover:underline">
             Войти
-          </Link>
-        </p>
-
-        <hr className="my-6 border-gray-200 sm:mx-auto" />
-
-        <p className="mt-2 text-center text-sm">
-          <Link href="/" className="text-blue-600 hover:underline">
-            Вернуться на главную
           </Link>
         </p>
       </div>
