@@ -1,18 +1,15 @@
 // tasker/src/hooks/useTasks.ts
-// Этот файл содержит хук для работы с задачами в приложении Tasker
-
-// Импортируем тип Task и хуки React для управления состоянием и эффектами
 import { Task } from '@/types/task';
 import { useState, useEffect } from 'react';
 import { mockTasks } from '@/mocks/tasks';
 
 /**
  * Кастомный React-хук useTasks:
- * - Загружает список задач с моковых данных или реального API
- * - Управляет состояниями tasks, loading и error
- * @param useMockData - Если true, использует моковые данные; иначе делает fetch-запрос.
+ * - Загружает список задач с моковых данных или реального API,
+ * основываясь на переменной окружения NEXT_PUBLIC_USE_MOCKS.
+ * - Управляет состояниями tasks, loading и error.
  */
-export const useTasks = (useMockData: boolean) => {
+export const useTasks = () => {
   // Состояние для хранения массива задач, изначально пустой массив
   const [tasks, setTasks] = useState<Task[]>([]);
   // Индикатор загрузки — true пока идёт загрузка
@@ -20,7 +17,10 @@ export const useTasks = (useMockData: boolean) => {
   // Ошибка загрузки — строка с сообщением или null, если ошибок нет
   const [error, setError] = useState<string | null>(null);
 
-  // useEffect запускается при монтировании компонента и при изменении useMockData
+  // Определяем, использовать ли моковые данные, из переменной окружения
+  const useMockData = process.env.NEXT_PUBLIC_USE_MOCKS === 'true';
+
+  // useEffect запускается при монтировании компонента
   useEffect(() => {
     const fetchTasks = async () => {
       // Сбрасываем состояния при каждом новом запросе
@@ -43,7 +43,8 @@ export const useTasks = (useMockData: boolean) => {
       } else {
         // Запрос к реальному API
         try {
-          const res = await fetch('/tasklist', {
+          // Здесь также можно использовать переменную окружения для URL
+          const res = await fetch('/list', {
             credentials: 'include',
           });
 
