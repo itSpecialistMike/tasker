@@ -4,13 +4,15 @@
 // Импортируем тип Task и хуки React для управления состоянием и эффектами
 import { Task } from '@/types/task';
 import { useState, useEffect } from 'react';
+import { mockTasks } from '@/mocks/tasks';
 
 /**
  * Кастомный React-хук useTasks:
- * - загружает список задач с API
- * - управляет состояниями tasks, loading и error
+ * - Загружает список задач с моковых данных или реального API
+ * - Управляет состояниями tasks, loading и error
+ * @param useMockData - Если true, использует моковые данные; иначе делает fetch-запрос.
  */
-export const useTasks = () => {
+export const useTasks = (useMockData: boolean) => {
   // Состояние для хранения массива задач, изначально пустой массив
   const [tasks, setTasks] = useState<Task[]>([]);
   // Индикатор загрузки — true пока идёт загрузка
@@ -18,37 +20,47 @@ export const useTasks = () => {
   // Ошибка загрузки — строка с сообщением или null, если ошибок нет
   const [error, setError] = useState<string | null>(null);
 
-  // useEffect вызывается один раз при монтировании компонента
+  // useEffect запускается при монтировании компонента и при изменении useMockData
   useEffect(() => {
-    // Асинхронная функция для загрузки задач с сервера
     const fetchTasks = async () => {
-      try {
-        // Отправляем GET-запрос на эндпоинт /tasklist
-        // credentials: 'include' — для отправки куков вместе с запросом (если JWT в cookie)
-        const res = await fetch('/tasklist', {
-          credentials: 'include',
-        });
+      // Сбрасываем состояния при каждом новом запросе
+      setLoading(true);
+      setError(null);
+      setTasks([]);
 
-        // Проверяем успешность ответа
-        if (!res.ok) throw new Error('Ошибка загрузки задач');
+      if (useMockData) {
+        // Имитация задержки для моковых данных
+        const delay = 500;
+        setTimeout(() => {
+          try {
+            setTasks(mockTasks);
+          } catch (err) {
+            setError("Ошибка при обработке моковых данных");
+          } finally {
+            setLoading(false);
+          }
+        }, delay);
+      } else {
+        // Запрос к реальному API
+        try {
+          const res = await fetch('/tasklist', {
+            credentials: 'include',
+          });
 
-        // Парсим JSON с сервера в массив задач типа Task[]
-        const data: Task[] = await res.json();
+          if (!res.ok) throw new Error('Ошибка загрузки задач');
 
-        // Обновляем состояние tasks загруженными данными
-        setTasks(data);
-      } catch (err) {
-        // Если произошла ошибка — записываем её сообщение в error
-        setError((err as Error).message);
-      } finally {
-        // В любом случае выключаем индикатор загрузки
-        setLoading(false);
+          const data: Task[] = await res.json();
+          setTasks(data);
+        } catch (err) {
+          setError((err as Error).message);
+        } finally {
+          setLoading(false);
+        }
       }
     };
 
-    // Запускаем загрузку задач
     fetchTasks();
-  }, []); // Пустой массив зависимостей — запускается только один раз
+  }, [useMockData]); // Зависимость от useMockData позволяет переключать источник данных
 
   // Возвращаем текущие данные, статус загрузки и ошибку из хука
   return { tasks, loading, error };

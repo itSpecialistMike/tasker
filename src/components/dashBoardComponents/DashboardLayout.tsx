@@ -77,7 +77,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   };
 
   return (
-    <section className="bg-white border border-gray-200 shadow-2xl rounded-4xl p-4 md:p-6 mb-10 mx-auto max-w-6xl">
+    <section className="bg-white border border-gray-200 shadow-2xl rounded-4xl p-4 md:p-6 mb-10 mx-auto max-w-6xl mt-20">
       {/* Заголовок таблицы */}
       <h2 className="text-xl font-bold mb-6 text-gray-800 text-center">
         {title}
