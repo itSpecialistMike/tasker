@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // Создаем экземпляр axios с базовым URL
 const API = axios.create({
-    baseURL: 'http://147.45.231.222:3000',
+    baseURL: process.env.NEXT_PUBLIC_API_URL,
     // ✔️ Эта опция критически важна! Она позволяет axios отправлять
     // cookie, которые были установлены сервером, с каждым запросом.
     withCredentials: true,
