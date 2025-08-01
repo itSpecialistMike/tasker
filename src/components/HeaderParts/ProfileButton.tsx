@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, LogOut, User as UserIcon, UserPlus } from "lucide-react";
-import { useRouter } from 'next/navigation'; // ✔️ Импортируем useRouter для навигации
+import { useRouter } from 'next/navigation';
 
 /**
  * Интерфейс для данных пользователя, основанный на предоставленной структуре JWT-ответа.
@@ -31,22 +31,22 @@ interface Props {
 
 const ProfileButton = ({ user, loading }: Props) => {
     const [isOpen, setIsOpen] = useState(false);
-    const router = useRouter(); // ✔️ Инициализируем useRouter
+    const router = useRouter();
 
     // Функция для закрытия меню
     const handleClose = () => setIsOpen(false);
 
-    // ✔️ Обновленная функция для выхода из системы
+    // ✔️ Обновленная функция для выхода из системы.
+    // Теперь она не взаимодействует с localStorage, так как
+    // аутентификация происходит через cookie.
     const handleLogout = () => {
-        // Удаляем токен из localStorage
-        localStorage.removeItem('jwtToken');
-        // Закрываем выпадающее меню
+        // Логика удаления cookie должна быть на стороне сервера через API-запрос.
+        // Сейчас мы просто перенаправляем пользователя.
         handleClose();
-        // Перенаправляем пользователя на главную страницу
-        router.push('/');
-        // Возможно, потребуется обновить глобальное состояние или контекст
-        // для сброса данных пользователя в приложении.
-        // Здесь можно было бы вызвать функцию из контекста, например, `userContext.logout()`
+        router.push('/login');
+        // В реальном приложении здесь должен быть вызов API,
+        // который сообщит серверу, чтобы он очистил cookie сессии.
+        // Пример: API.post('/api/logout');
     };
 
     // Отображение состояния загрузки

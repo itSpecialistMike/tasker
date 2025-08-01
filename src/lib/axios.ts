@@ -9,19 +9,4 @@ const API = axios.create({
     withCredentials: true,
 });
 
-/**
- * Интерцептор, который автоматически добавляет токен из cookie.
- * Эта часть кода не нужна, если токен передается через cookie, а не
- * через заголовок 'Authorization'. Axios сам отправит cookie.
- *
- * Если бы токен хранился в localStorage, интерцептор выглядел бы так:
- * API.interceptors.request.use((config) => {
- * const token = localStorage.getItem('jwtToken');
- * if (token) {
- * config.headers['Authorization'] = `Bearer ${token}`;
- * }
- * return config;
- * });
- */
-
 export default API;
