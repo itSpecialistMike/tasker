@@ -1,23 +1,159 @@
 // tasker/src/components/HeaderParts/ProfileButton.tsx
-// Этот файл содержит компонент ProfileButton, который отображает кнопку профиля пользователя в приложении Tasker
-import Link from "next/link";
+// Этот файл содержит компонент ProfileButton, который отображает выпадающее меню пользователя
+"use client";
 
-const ProfileButton = () => (
-  <Link
-    href="/register"
-    className="w-9 h-9 rounded-full md:scale-100 lg:scale-100 scale-125 bg-indigo-900 hover:bg-indigo-700 hover:scale-125 transform duration-300 text-white flex items-center justify-center text-sm font-medium"
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      stroke="currentColor"
-      strokeWidth="50"
-      height="1em"
-      fill="currentColor"
-      viewBox="0 0 512 512"
-    >
-      <path d="M 368 128 Q 368 98 353 72 L 353 72 L 353 72 Q 338 46 312 31 Q 286 16 256 16 Q 226 16 200 31 Q 174 46 159 72 Q 144 98 144 128 Q 144 158 159 184 Q 174 210 200 225 Q 226 240 256 240 Q 286 240 312 225 Q 338 210 353 184 Q 368 158 368 128 L 368 128 Z M 128 128 Q 128 93 145 64 L 145 64 L 145 64 Q 162 35 192 17 Q 222 0 256 0 Q 290 0 320 17 Q 350 35 367 64 Q 384 93 384 128 Q 384 163 367 192 Q 350 221 320 239 Q 290 256 256 256 Q 222 256 192 239 Q 162 221 145 192 Q 128 163 128 128 L 128 128 Z M 48 482 Q 49 495 62 496 L 450 496 L 450 496 Q 463 495 464 482 Q 462 413 416 368 Q 371 322 302 320 L 210 320 L 210 320 Q 141 322 96 368 Q 50 413 48 482 L 48 482 Z M 32 482 Q 34 407 84 356 L 84 356 L 84 356 Q 135 306 210 304 L 302 304 L 302 304 Q 377 306 428 356 Q 478 407 480 482 Q 480 495 471 503 Q 463 512 450 512 L 62 512 L 62 512 Q 49 512 41 503 Q 32 495 32 482 L 32 482 Z" />
-    </svg>
-  </Link>
-);
+import Link from "next/link";
+import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronDown, LogOut, User as UserIcon, UserPlus } from "lucide-react";
+import { useRouter } from 'next/navigation'; // ✔️ Импортируем useRouter для навигации
+
+/**
+ * Интерфейс для данных пользователя, основанный на предоставленной структуре JWT-ответа.
+ */
+interface User {
+    id: number;
+    name: string;
+    surname: string;
+    login: string;
+    roleID: number;
+}
+
+/**
+ * Пропсы для ProfileButton:
+ * - user: объект пользователя, может быть null
+ * - loading: флаг загрузки
+ */
+interface Props {
+    user: User | null;
+    loading: boolean;
+}
+
+const ProfileButton = ({ user, loading }: Props) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const router = useRouter(); // ✔️ Инициализируем useRouter
+
+    // Функция для закрытия меню
+    const handleClose = () => setIsOpen(false);
+
+    // ✔️ Обновленная функция для выхода из системы
+    const handleLogout = () => {
+        // Удаляем токен из localStorage
+        localStorage.removeItem('jwtToken');
+        // Закрываем выпадающее меню
+        handleClose();
+        // Перенаправляем пользователя на главную страницу
+        router.push('/');
+        // Возможно, потребуется обновить глобальное состояние или контекст
+        // для сброса данных пользователя в приложении.
+        // Здесь можно было бы вызвать функцию из контекста, например, `userContext.logout()`
+    };
+
+    // Отображение состояния загрузки
+    if (loading) {
+        return <div className="w-10 h-10 rounded-full bg-gray-200 animate-pulse" />;
+    }
+
+    // Логика для авторизованного пользователя
+    if (user) {
+        return (
+            <div className="relative inline-block text-left">
+                <button
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-900 text-white hover:bg-indigo-700 transition-colors transform duration-300"
+                    aria-haspopup="true"
+                    aria-expanded={isOpen}
+                >
+                    <span className="font-bold hidden sm:inline">
+                        Привет, {user.login}
+                    </span>
+                    <UserIcon size={18} />
+                </button>
+                <AnimatePresence>
+                    {isOpen && (
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                            transition={{ duration: 0.2 }}
+                            className="absolute right-0 mt-2 w-56 origin-top-right rounded-2xl bg-white shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+                        >
+                            <div className="py-2 px-4 border-b border-gray-100">
+                                <p className="text-sm font-medium text-gray-900">
+                                    {user.name} {user.surname}
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                    @{user.login}
+                                </p>
+                            </div>
+                            <div className="py-1">
+                                <Link
+                                    href="/profile"
+                                    onClick={handleClose}
+                                    className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                                >
+                                    <UserIcon size={16} />
+                                    <span>Профиль</span>
+                                </Link>
+                                <button
+                                    onClick={handleLogout}
+                                    className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                                >
+                                    <LogOut size={16} />
+                                    <span>Выйти</span>
+                                </button>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+        );
+    }
+
+    // Логика для неавторизованного пользователя
+    return (
+        <div className="relative inline-block text-left">
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-900 text-white hover:bg-indigo-700 transition-colors transform duration-300"
+                aria-haspopup="true"
+                aria-expanded={isOpen}
+            >
+                <span className="font-bold hidden sm:inline">Войти</span>
+                <ChevronDown size={18} />
+            </button>
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute right-0 mt-2 w-48 origin-top-right rounded-2xl bg-white shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+                    >
+                        <div className="py-1">
+                            <Link
+                                href="/login"
+                                onClick={handleClose}
+                                className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            >
+                                <UserIcon size={16} />
+                                <span>Авторизация</span>
+                            </Link>
+                            <Link
+                                href="/register"
+                                onClick={handleClose}
+                                className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            >
+                                <UserPlus size={16} />
+                                <span>Регистрация</span>
+                            </Link>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+};
 
 export default ProfileButton;

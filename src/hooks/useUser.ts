@@ -1,79 +1,60 @@
-// src/hooks/useUser.ts
-// Этот файл содержит хук для получения информации о текущем пользователе в приложении Tasker
-
+// tasker/src/hooks/useUser.ts
 import { useState, useEffect } from 'react';
+import API from '@/lib/axios';
 
 /**
- * Интерфейс User:
- * Описывает структуру объекта пользователя, возвращаемого с сервера.
- * Здесь можно добавить любые дополнительные поля, которые приходят из /api/userByJWT.
+ * Интерфейс для данных пользователя.
  */
 interface User {
-  id: string;
+  id: number;
   name: string;
+  surname: string;
+  middlename: string;
   login: string;
-  // Добавь другие поля по необходимости, например: email, role, etc.
+  roleID: number;
 }
 
 /**
- * Интерфейс возвращаемого значения из useUser:
- * - user: объект пользователя или null, если пользователь не авторизован
- * - loading: true во время загрузки, false после завершения запроса
- * - error: сообщение об ошибке, если она произошла
+ * Интерфейс для результата хука useUser:
+ * - user: объект пользователя или null
+ * - loading: флаг загрузки
+ * - error: сообщение об ошибке или null
  */
-interface UseUserReturn {
+interface UseUserResult {
   user: User | null;
   loading: boolean;
   error: string | null;
 }
 
 /**
- * Хук useUser:
- * Выполняет запрос к API для получения информации о текущем авторизованном пользователе.
- * Ожидается, что сервер определяет пользователя на основе JWT, передаваемого через HttpOnly cookie.
- * Если пользователь авторизован, в стейт записывается объект user.
- * Если нет — error и user = null.
+ * Кастомный React-хук useUser:
+ * - Выполняет запрос к API для получения данных пользователя,
+ * опираясь на аутентификационный cookie, установленный сервером.
+ * - Возвращает объект пользователя, а также состояния loading и error.
  */
-export const useUser = (): UseUserReturn => {
-  const [user, setUser] = useState<User | null>(null); // Текущее состояние пользователя
-  const [loading, setLoading] = useState(true);        // Индикатор загрузки
-  const [error, setError] = useState<string | null>(null); // Сообщение об ошибке
+export function useUser(): UseUserResult {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  /**
-   * useEffect:
-   * Выполняется один раз при монтировании компонента.
-   * Выполняет GET-запрос к /api/userByJWT, чтобы получить данные о текущем пользователе.
-   */
   useEffect(() => {
     const fetchUser = async () => {
+      setError(null);
+      setLoading(true);
+
       try {
-        setLoading(true); // Устанавливаем состояние загрузки
-
-        const res = await fetch('/api/userme', {
-          credentials: 'include', // Важно: позволяет отправлять cookie вместе с запросом
-        });
-
-        // Если ответ не ок, значит пользователь не авторизован или произошла ошибка
-        if (!res.ok) {
-          setUser(null);
-          setError('Не авторизован');
-          return;
-        }
-
-        const data: User = await res.json(); // Парсим тело ответа
-        setUser(data);                       // Сохраняем пользователя в стейт
-      } catch (e) {
-        // Обработка ошибок сети или парсинга
-        setError('Ошибка при загрузке пользователя');
-        setUser(null);
+        // Запрос к API. Axios автоматически отправит cookie.
+        const response = await API.get<User>('/api/getuserbyJWT');
+        setUser(response.data);
+      } catch (err: any) {
+        setError(err.response?.data?.message || 'Ошибка загрузки данных пользователя');
       } finally {
-        setLoading(false); // Завершаем загрузку в любом случае
+        setLoading(false);
       }
     };
 
     fetchUser();
   }, []);
 
-  // Возвращаем объект с данными о пользователе, индикатором загрузки и ошибкой
   return { user, loading, error };
-};
+}

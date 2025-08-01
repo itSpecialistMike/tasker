@@ -2,12 +2,14 @@
 import { Task } from '@/types/task';
 import { useState, useEffect } from 'react';
 import { mockTasks } from '@/mocks/tasks';
+import API from '@/lib/axios'; // Импортируем настроенный экземпляр axios
 
 /**
  * Кастомный React-хук useTasks:
- * - Загружает список задач с моковых данных или реального API,
- * основываясь на переменной окружения NEXT_PUBLIC_USE_MOCKS.
+ * - Загружает список задач с моковых данных или реального API.
  * - Управляет состояниями tasks, loading и error.
+ * - Примечание: Токен аутентификации в виде cookie автоматически
+ * добавляется настроенным экземпляром axios.
  */
 export const useTasks = () => {
   // Состояние для хранения массива задач, изначально пустой массив
@@ -20,7 +22,6 @@ export const useTasks = () => {
   // Определяем, использовать ли моковые данные, из переменной окружения
   const useMockData = process.env.NEXT_PUBLIC_USE_MOCKS === 'true';
 
-  // useEffect запускается при монтировании компонента
   useEffect(() => {
     const fetchTasks = async () => {
       // Сбрасываем состояния при каждом новом запросе
@@ -28,35 +29,29 @@ export const useTasks = () => {
       setError(null);
       setTasks([]);
 
-      if (useMockData) {
-        // Имитация задержки для моковых данных
-        const delay = 500;
-        setTimeout(() => {
-          try {
-            setTasks(mockTasks);
-          } catch (err) {
-            setError("Ошибка при обработке моковых данных");
-          } finally {
-            setLoading(false);
+      try {
+        if (useMockData) {
+          // Имитация асинхронной задержки с использованием Promise
+          await new Promise(resolve => setTimeout(resolve, 500));
+          setTasks(mockTasks);
+        } else {
+          // Запрос к реальному API с использованием axios
+          // Токен добавляется в виде cookie благодаря настройке в axios.ts
+          const response = await API.get('/api/list');
+
+          if (response.status !== 200) {
+            throw new Error('Ошибка загрузки задач');
           }
-        }, delay);
-      } else {
-        // Запрос к реальному API
-        try {
-          // Здесь также можно использовать переменную окружения для URL
-          const res = await fetch('/list', {
-            credentials: 'include',
-          });
 
-          if (!res.ok) throw new Error('Ошибка загрузки задач');
-
-          const data: Task[] = await res.json();
+          const data: Task[] = response.data;
           setTasks(data);
-        } catch (err) {
-          setError((err as Error).message);
-        } finally {
-          setLoading(false);
         }
+      } catch (err: any) {
+        // Улучшенная обработка ошибок для axios
+        const errorMessage = err.response?.data?.error || err.message || 'Неизвестная ошибка';
+        setError(errorMessage);
+      } finally {
+        setLoading(false);
       }
     };
 

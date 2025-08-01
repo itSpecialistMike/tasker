@@ -1,37 +1,27 @@
 // tasker/src/lib/axios.ts
-// Этот файл содержит преднастроенный экземпляр axios для работы с API
-// Импортируем axios — HTTP-клиент для отправки запросов
 import axios from 'axios';
 
-/**
- * Создаём экземпляр axios с базовой конфигурацией:
- * - baseURL: корневой URL для всех запросов, берётся из переменной окружения
- * - headers: устанавливаем Content-Type по умолчанию как application/json
- */
+// Создаем экземпляр axios с базовым URL
 const API = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+    baseURL: 'http://147.45.231.222:3000',
+    // ✔️ Эта опция критически важна! Она позволяет axios отправлять
+    // cookie, которые были установлены сервером, с каждым запросом.
+    withCredentials: true,
 });
 
 /**
- * Добавляем интерцептор запросов:
- * - перед каждым запросом получаем JWT из localStorage
- * - если токен есть, добавляем его в заголовок Authorization
- * - это позволяет автоматически авторизовывать все запросы
+ * Интерцептор, который автоматически добавляет токен из cookie.
+ * Эта часть кода не нужна, если токен передается через cookie, а не
+ * через заголовок 'Authorization'. Axios сам отправит cookie.
+ *
+ * Если бы токен хранился в localStorage, интерцептор выглядел бы так:
+ * API.interceptors.request.use((config) => {
+ * const token = localStorage.getItem('jwtToken');
+ * if (token) {
+ * config.headers['Authorization'] = `Bearer ${token}`;
+ * }
+ * return config;
+ * });
  */
-API.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('jwtToken');
-    if (token) {
-      config.headers = config.headers ?? {};
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error) // В случае ошибки запроса — пробрасываем её дальше
-);
 
-// Экспортируем настроенный экземпляр axios для повторного использования
 export default API;

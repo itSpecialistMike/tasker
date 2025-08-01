@@ -2,8 +2,10 @@
 // этот файл содержит типы для пользователей в приложении Tasker
 
 export interface User {
-  id: string;
+  id: number;
   name: string;
-  email?: string;
-  avatarUrl?: string;
+  surname: string;
+  middlename: string;
+  login: string;
+  roleID: number;
 }
