@@ -1,29 +1,25 @@
-// tasker/src/components/HeaderParts/NavMobile.tsx
 "use client";
 
-import { mockDashboards } from "@/mocks/dashboards";
 import ProfileButton from "./ProfileButton";
+import { useDashboard } from "@/hooks/useDashboard";
 import { useRouter } from "next/navigation";
-import { useDashboard } from "@/hooks/useDashboard"; //  // ✔️ Импортируем хук
 
-/**
- * Тип пропсов для NavMobile:
- * - onClose: функция закрытия меню
- */
 type Props = {
     onClose: () => void;
 };
 
 const NavMobile: React.FC<Props> = ({ onClose }) => {
-    // ✔️ Получаем данные и обработчик из контекста
-    const { selectedDashboardId, onDashboardChange } = useDashboard();
+    const { selectedDashboardId, onDashboardChange, dashboards } = useDashboard();
     const router = useRouter();
 
     const handleDashboardSelect = (id: string) => {
-        onDashboardChange(id); // ✔️ Используем функцию из контекста
+        onDashboardChange(id);
         onClose();
-        // router.push(`/?dashboardId=${id}`); // ✔️ Эту строку можно убрать, так как она уже в контексте
     };
+
+    if (!dashboards.length) {
+        return <div>Загрузка дашбордов...</div>;
+    }
 
     return (
         <div className="absolute top-16 left-0 w-full bg-white shadow-md z-10 flex flex-col items-start px-6 py-4 space-y-4 md:hidden">
@@ -32,7 +28,7 @@ const NavMobile: React.FC<Props> = ({ onClose }) => {
                     Дашборды
                 </summary>
                 <div className="ml-4 mt-2 space-y-1">
-                    {mockDashboards.map((db) => (
+                    {dashboards.map((db) => (
                         <button
                             key={db.id}
                             className={`block text-left text-2xl w-full ${

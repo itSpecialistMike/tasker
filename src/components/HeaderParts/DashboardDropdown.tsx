@@ -1,40 +1,57 @@
-// tasker/src/components/HeaderParts/DashboardDropdown.tsx
 "use client";
 
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import { mockDashboards } from "@/mocks/dashboards";
-import { useRouter } from "next/navigation";
+import { useDashboard } from "@/hooks/useDashboard";
 import { AnimatePresence, motion } from "framer-motion";
-import { useDashboard } from "@/hooks/useDashboard"; //
 
 /**
  * Компонент DashboardDropdown:
  * - Выпадающее меню выбора дашборда
  */
 const DashboardDropdown: React.FC = () => {
-    const { selectedDashboardId, onDashboardChange } = useDashboard();
+    const { dashboards, selectedDashboardId, onDashboardChange, loading } = useDashboard();
+    console.log("selectedDashboardId:", selectedDashboardId);
+    // console.log("dashboards:", dashboards);
+
     const [open, setOpen] = useState(false);
-    const selectedDashboard = mockDashboards.find((d) => d.id === selectedDashboardId);
-    const router = useRouter();
+
+    if (loading) {
+        return (
+            <button disabled className="px-4 py-2">
+                Загрузка...
+            </button>
+        );
+    }
+
+    if (dashboards.length === 0) {
+        return (
+            <button disabled className="px-4 py-2">
+                Дашборды не найдены
+            </button>
+        );
+    }
+
+    const selectedDashboard = dashboards.find((d) => d.id === selectedDashboardId);
 
     const handleSelect = (id: string) => {
-        onDashboardChange(id);
         setOpen(false);
+        onDashboardChange(id);
     };
 
     return (
         <div className="relative inline-block">
             <button
-                onClick={() => setOpen((o) => !o)}
+                onClick={() => {setOpen((o) => !o); console.log("open =", !open);}}
                 className="flex items-center gap-1 px-4 py-2 rounded-2xl hover:bg-gray-100 hover:scale-105 transform duration-300"
                 aria-haspopup="listbox"
                 aria-expanded={open}
                 type="button"
             >
-                {selectedDashboard?.name || "Выберите дашборд"}
+                {selectedDashboard ? selectedDashboard.name : "Выберите дашборд"}
                 <ChevronDown size={16} />
             </button>
+
             <AnimatePresence>
                 {open && (
                     <motion.div
@@ -45,7 +62,7 @@ const DashboardDropdown: React.FC = () => {
                         transition={{ duration: 0.2 }}
                         className="absolute mt-1 bg-white rounded-2xl shadow w-48 z-50 overflow-hidden origin-top"
                     >
-                        {mockDashboards.map((db) => (
+                        {dashboards.map((db) => (
                             <button
                                 key={db.id}
                                 role="option"

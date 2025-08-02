@@ -7,6 +7,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, LogOut, User as UserIcon, UserPlus } from "lucide-react";
 import { useRouter } from 'next/navigation';
+import { useUserContext } from "@/context/UserContext";
 
 /**
  * Интерфейс для данных пользователя, основанный на предоставленной структуре JWT-ответа.
@@ -24,14 +25,11 @@ interface User {
  * - user: объект пользователя, может быть null
  * - loading: флаг загрузки
  */
-interface Props {
-    user: User | null;
-    loading: boolean;
-}
 
-const ProfileButton = ({ user, loading }: Props) => {
+const ProfileButton = () => {
     const [isOpen, setIsOpen] = useState(false);
     const router = useRouter();
+    const { user, loading } = useUserContext();
 
     // Функция для закрытия меню
     const handleClose = () => setIsOpen(false);

@@ -6,6 +6,8 @@ import BackgroundBlur from "../components/BackgroundBlur";
 import Header from "../components/Header";
 import { DashboardProvider } from "@/context/DashboardContext";
 import Footer from "@/components/Footer";
+import { ModalProvider } from "@/context/ModalContext";
+import { UserProvider } from "@/context/UserContext";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -32,18 +34,17 @@ export default function RootLayout({
         {/* Добавляем классы flex, flex-col и min-h-screen, чтобы body стал flex-контейнером, растягивающимся на всю высоту */}
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}>
         <BackgroundBlur />
-        <DashboardProvider>
-            {/* Header остается сверху */}
-            <Header />
-
-            {/* ✔️ Оборачиваем children в main с flex-grow, чтобы он занимал все доступное пространство */}
-            <main className="flex-grow">
-                {children}
-            </main>
-
-            {/* Footer остается внизу */}
+        <ModalProvider>
+            <UserProvider>
+            <DashboardProvider>
+                <Header />
+                <main className="flex-grow">
+                    {children}
+                </main>
             <Footer />
-        </DashboardProvider>
+            </DashboardProvider>
+            </UserProvider>
+        </ModalProvider>
         </body>
         </html>
     );

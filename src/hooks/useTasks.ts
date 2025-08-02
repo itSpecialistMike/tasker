@@ -37,7 +37,7 @@ export const useTasks = () => {
         } else {
           // Запрос к реальному API с использованием axios
           // Токен добавляется в виде cookie благодаря настройке в axios.ts
-          const response = await API.get('/api/list');
+          const response = await API.get('/list');
 
           if (response.status !== 200) {
             throw new Error('Ошибка загрузки задач');

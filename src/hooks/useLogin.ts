@@ -2,7 +2,8 @@
 // Этот файл содержит хук для авторизации пользователя в приложении Tasker
 import { useState } from 'react';
 import API from '@/lib/axios'; // Преднастроенный axios-инстанс
-
+import { useUserContext } from "@/context/UserContext";
+import { useDashboard } from "@/hooks/useDashboard";
 /**
  * Интерфейс для входных данных авторизации:
  * - login: строка (логин пользователя)
@@ -21,6 +22,10 @@ interface LoginData {
 export const useLogin = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { refetchUser } = useUserContext(); // функция из UserContext
+  const { refetchDashboards } = useDashboard();
+
+
 
   /**
    * loginUser:
@@ -39,17 +44,19 @@ export const useLogin = () => {
 
       if (response.status === 200) {
         // Сервер успешно установил cookie.
+        await refetchUser();//обновляем user сразу после логина
+        await refetchDashboards(); // обновляем дашборды после логина
         return { success: true, data: response.data };
       } else {
         return { success: false };
       }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Ошибка авторизации');
+      console.log(err)
       return { success: false };
     } finally {
       setLoading(false);
     }
   };
-
   return { loginUser, error, loading };
 };

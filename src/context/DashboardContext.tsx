@@ -1,66 +1,85 @@
-// tasker/src/context/DashboardContext.tsx
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode, useCallback } from "react";
+import React, {
+    createContext,
+    useContext,
+    useState,
+    ReactNode,
+    useCallback,
+    useEffect,
+} from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { mockDashboards } from "@/mocks/dashboards";
+import { useFetchDashboards } from "@/hooks/useFetchDashboards"; // ⬅️ импортируем реальный хук
+import { Dashboard } from "@/types/dashboard";
 
-// Определяем интерфейс для нашего контекста
+
 interface DashboardContextType {
     selectedDashboardId: string;
     onDashboardChange: (id: string) => void;
+    dashboards: Dashboard[];
+    loading: boolean;
+    error: string | null;
+    refetchDashboards: () => Promise<void>;
 }
 
-// Создаем контекст с начальными значениями по умолчанию
 export const DashboardContext = createContext<DashboardContextType | undefined>(
     undefined
 );
 
-// Определяем тип для пропсов провайдера
 interface DashboardProviderProps {
     children: ReactNode;
 }
 
-/**
- * Компонент-провайдер для контекста дашборда.
- * Оборачивает дочерние компоненты и предоставляет им доступ
- * к состоянию выбранного дашборда и функции для его изменения.
- */
 export const DashboardProvider: React.FC<DashboardProviderProps> = ({
                                                                         children,
                                                                     }) => {
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    // Получаем начальный dashboardId из URL-параметров.
-    const initialDashboardId = searchParams
-        ? searchParams.get("dashboardId") || mockDashboards[0].id
-        : mockDashboards[0].id;
+    const { data: dashboards = [], loading, error, refetchDashboards } = useFetchDashboards();
 
-    const [selectedDashboardId, setSelectedDashboardId] = useState<string>(
-        initialDashboardId
+    // selectedDashboardId должен определяться после загрузки данных
+    const [selectedDashboardId, setSelectedDashboardId] = useState<string>("");
+
+    // Ждём загрузки данных и потом устанавливаем дефолтный ID
+    useEffect(() => {
+        if (!loading && dashboards.length > 0 && selectedDashboardId === "") {
+            const urlId = searchParams?.get("dashboardId");
+            const initialId = urlId ?? dashboards[0].id;
+            setSelectedDashboardId(initialId);
+        }
+    }, [loading, dashboards, searchParams, selectedDashboardId]);
+
+
+    const onDashboardChange = useCallback(
+        (id: string) => {
+            if (id === selectedDashboardId) return; // если тот же ID, ничего не делаем
+            setSelectedDashboardId(id);
+            router.push(`/?dashboardId=${id}`, undefined, { shallow: true });
+        },
+        [router, selectedDashboardId]
     );
 
-    // ✔️ Используем useCallback для мемоизации onDashboardChange.
-    // Это предотвратит бесконечный цикл в useEffect, так как функция
-    // будет создана только один раз (при первом рендере) и не будет меняться.
-    const onDashboardChange = useCallback((id: string) => {
-        setSelectedDashboardId(id);
-        // Обновляем URL-параметр при смене дашборда
-        router.push(`/?dashboardId=${id}`);
-    }, [router]); // Зависимость: router
+    // мемоизация отбьекта
+    const value = React.useMemo(() => ({
+        selectedDashboardId,
+        onDashboardChange,
+        dashboards,
+        loading,
+        error,
+        refetchDashboards,
+    }), [selectedDashboardId, onDashboardChange, dashboards, loading, error, refetchDashboards]);
 
     return (
-        <DashboardContext.Provider value={{ selectedDashboardId, onDashboardChange }}>
+        <DashboardContext.Provider
+            value={value}
+        >
+
             {children}
         </DashboardContext.Provider>
     );
 };
 
-/**
- * Кастомный хук для удобного доступа к контексту дашборда.
- * Вызывает ошибку, если используется вне DashboardProvider.
- */
 export const useDashboard = () => {
     const context = useContext(DashboardContext);
     if (context === undefined) {

@@ -15,5 +15,5 @@ export const useDashboard = () => {
     if (context === undefined) {
         throw new Error("useDashboard must be used within a DashboardProvider");
     }
-    return context;
+    return context; // должно возвращать selectedDashboardId, onDashboardChange, dashboards, loading
 };
