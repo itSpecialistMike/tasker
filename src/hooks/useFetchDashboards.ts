@@ -1,47 +1,38 @@
+// src/hooks/useFetchDashboards.ts
 import { useState, useEffect } from "react";
 import { Dashboard } from '@/types/dashboard';
-import { mockDashboards } from '@/mocks/dashboards';
 import API from '@/lib/axios';
 
 export const useFetchDashboards = () => {
-    const fallbackDashboard: Dashboard[] = [
-        { id: "all", name: "Все дашборды" } // используем id с маленькой буквы
-    ];
-
     const [data, setData] = useState<Dashboard[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const useMocks = process.env.NEXT_PUBLIC_USE_MOCKS === 'true';
-
-    // Функция для нормализации данных с любого формата ID/id в id
+    // Нормализация ID в формат с маленькой буквы
     const normalizeDashboards = (dashboardsFromBackend: any[]): Dashboard[] => {
         return dashboardsFromBackend.map(d => ({
-            id: d.ID ?? d.id, // если есть ID - берем его, иначе id
+            id: d.ID ?? d.id,
             name: d.name,
-            // если есть другие поля, добавь их здесь
         }));
     };
 
     const fetchDashboard = async () => {
         setLoading(true);
         setError(null);
+
         try {
-            if (useMocks) {
-                // нормализуем моковые данные тоже
-                const dashboardsToSet = mockDashboards.length > 0 ? mockDashboards : fallbackDashboard;
-                setData(normalizeDashboards(dashboardsToSet));
-            } else {
-                const response = await API.get('/showDB');
-                if (Array.isArray(response.data) && response.data.length > 0) {
-                    setData(normalizeDashboards(response.data));
-                } else {
-                    setData(fallbackDashboard);
-                }
-            }
+            const response = await API.get('/showDB');
+
+            const dashboards = Array.isArray(response.data)
+                ? normalizeDashboards(response.data)
+                : [];
+
+            // Всегда добавляем "Все дашборды" в начало
+            setData([{ id: "all", name: "Все дашборды" }, ...dashboards]);
         } catch (error: any) {
             setError(error.message || 'Ошибка при загрузке дашбордов');
-            setData(fallbackDashboard);
+            // Даже в случае ошибки "Все дашборды" остаётся
+            setData([{ id: "all", name: "Все дашборды" }]);
         } finally {
             setLoading(false);
         }

@@ -1,6 +1,7 @@
-import React, { useMemo } from "react";
+import React from "react";
 import DashboardLayout from "./DashboardLayout";
 import { useTasks } from "@/hooks/useTasks";
+import { useTasksByDB } from "@/hooks/UseTasksByDB";
 import { useSortedTasks } from "@/hooks/useSortedTasks";
 import { useFetchDashboards } from "@/hooks/useFetchDashboards";
 
@@ -9,22 +10,31 @@ type Props = {
 };
 
 const DashboardView: React.FC<Props> = ({ dashboardId }) => {
-  const { tasks, loading: tasksLoading, error: tasksError } = useTasks();
-  const { data: dashboards, loading: dashboardsLoading, error: dashboardsError } = useFetchDashboards();
+  const {
+    data: dashboards = [],
+    loading: dashboardsLoading,
+    error: dashboardsError,
+  } = useFetchDashboards();
 
-  // Выбираем ID активного дашборда (хуки выше — так правильно)
-  const activeDashboardId = dashboardId ?? dashboards[1]?.id ?? "";
+  const activeDashboardId: string =
+      typeof dashboardId === "string"
+          ? dashboardId
+          : typeof dashboards[0]?.id === "string"
+              ? dashboards[0].id
+              : "";
 
-  // Фильтрация задач — хук useMemo должен идти здесь, а не после return
-  const filteredTasks = useMemo(() => {
-    if (dashboardId === "all") return tasks;
-    return tasks.filter((task) => task.dashboardId === activeDashboardId);
-  }, [dashboardId, activeDashboardId, tasks]);
+  // Вызываем оба хука всегда
+  const allTasks = useTasks(activeDashboardId === "" || activeDashboardId === "all");
+  const tasksByDB = useTasksByDB(
+      activeDashboardId !== "" && activeDashboardId !== "all" ? activeDashboardId : null
+  );
 
-  // Сортировка — тоже хук, должен быть выше return
-  const { sortedTasks, sortField, sortOrder, toggleSort } = useSortedTasks(filteredTasks);
+  // Выбираем задачи из нужного источника
+  const tasks = activeDashboardId === "" || activeDashboardId === "all" ? allTasks.tasks : tasksByDB.tasks;
+  const tasksLoading = allTasks.loading || tasksByDB.loading;
+  const tasksError = allTasks.error || tasksByDB.error;
 
-  // А вот состояние загрузки и ошибки — их можно обрабатывать после вызова хуков
+  const { sortedTasks, sortField, sortOrder, toggleSort } = useSortedTasks(tasks);
 
   if (dashboardsLoading || tasksLoading)
     return <div className="p-4 text-gray-500">Загрузка...</div>;
@@ -35,7 +45,6 @@ const DashboardView: React.FC<Props> = ({ dashboardId }) => {
   if (tasksError)
     return <div className="p-4 text-red-500">Ошибка загрузки задач: {tasksError}</div>;
 
-  // Название дашборда
   const title = dashboards.find((d) => d.id === activeDashboardId)?.name ?? "Дашборд";
 
   return (

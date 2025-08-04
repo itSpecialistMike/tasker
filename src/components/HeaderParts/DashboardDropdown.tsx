@@ -6,13 +6,16 @@ import { useDashboard } from "@/hooks/useDashboard";
 import { AnimatePresence, motion } from "framer-motion";
 
 /**
- * Компонент DashboardDropdown:
- * - Выпадающее меню выбора дашборда
+ * Выпадающий список для выбора дашборда.
+ * Использует массив дашбордов из контекста, где уже есть "Все дашборды".
  */
 const DashboardDropdown: React.FC = () => {
-    const { dashboards, selectedDashboardId, onDashboardChange, loading } = useDashboard();
-    console.log("selectedDashboardId:", selectedDashboardId);
-    // console.log("dashboards:", dashboards);
+    const {
+        dashboards,           // dashboards уже содержит "Все дашборды"
+        selectedDashboardId,
+        onDashboardChange,
+        loading,
+    } = useDashboard();
 
     const [open, setOpen] = useState(false);
 
@@ -32,7 +35,10 @@ const DashboardDropdown: React.FC = () => {
         );
     }
 
-    const selectedDashboard = dashboards.find((d) => d.id === selectedDashboardId);
+    // Просто ищем выбранный дашборд в массиве из контекста
+    const selectedDashboard = dashboards.find(
+        (d) => d.id === selectedDashboardId
+    );
 
     const handleSelect = (id: string) => {
         setOpen(false);
@@ -42,7 +48,7 @@ const DashboardDropdown: React.FC = () => {
     return (
         <div className="relative inline-block">
             <button
-                onClick={() => {setOpen((o) => !o); console.log("open =", !open);}}
+                onClick={() => setOpen((prev) => !prev)}
                 className="flex items-center gap-1 px-4 py-2 rounded-2xl hover:bg-gray-100 hover:scale-105 transform duration-300"
                 aria-haspopup="listbox"
                 aria-expanded={open}
