@@ -28,7 +28,7 @@ export const ModalProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             {modalContent && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
                     <div
-                        className="bg-white rounded-4xl p-6 w-full max-w-1/3 relative shadow-lg z-50"
+                        className="bg-white rounded-4xl p-6 w-full lg:max-w-1/3 relative shadow-lg z-50"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <button
