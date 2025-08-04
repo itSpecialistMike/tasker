@@ -1,39 +1,44 @@
-import { Task } from '@/types/task';
-import { useState, useEffect } from 'react';
-import API from '@/lib/axios'; // Импорт настроенного axios
+import { useState, useEffect, useCallback } from "react";
+import { Task } from "@/types/task";
+import API from "@/lib/axios";
 
 export const useTasks = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // useTasks.ts
-  useEffect(() => {
-    const fetchTasks = async () => {
-      setLoading(true);
-      setError(null);
-      setTasks([]);
+  // Оборачиваем fetchTasks в useCallback, чтобы избежать лишних перерендеров
+  const fetchTasks = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    setTasks([]);
 
-      try {
-        const response = await API.get('/list');
+    try {
+      const response = await API.get("/list");
 
-        if (response.status !== 200) {
-          throw new Error('Ошибка загрузки задач');
-        }
-
-        const data: Task[] = response.data;
-        setTasks(data);
-      } catch (err: any) {
-        const errorMessage = err.response?.data?.error || err.message || 'Неизвестная ошибка';
-        setError(errorMessage);
-      } finally {
-        setLoading(false);
+      if (response.status !== 200) {
+        throw new Error("Ошибка загрузки задач");
       }
-    };
 
+      setTasks(response.data);
+    } catch (err: any) {
+      const errorMessage =
+          err.response?.data?.error || err.message || "Неизвестная ошибка";
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Загружаем при инициализации
+  useEffect(() => {
     fetchTasks();
-  }, []); // пустой массив — всегда одинаковый размер
+  }, [fetchTasks]);
 
-
-  return { tasks, loading, error };
+  return {
+    tasks,
+    loading,
+    error,
+    refetch: fetchTasks, // Можно использовать вручную или извне
+  };
 };

@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useRef } from "react";
 import DashboardLayout from "./DashboardLayout";
 import { useTasks } from "@/hooks/useTasks";
 import { useTasksByDB } from "@/hooks/UseTasksByDB";
@@ -23,29 +25,67 @@ const DashboardView: React.FC<Props> = ({ dashboardId }) => {
               ? dashboards[0].id
               : "";
 
-  // Вызываем оба хука всегда
-  const allTasks = useTasks(activeDashboardId === "" || activeDashboardId === "all");
-  const tasksByDB = useTasksByDB(
-      activeDashboardId !== "" && activeDashboardId !== "all" ? activeDashboardId : null
+  // Хук для всех задач (если "all")
+  const {
+    tasks: allTasksList,
+    loading: allLoading,
+    error: allError,
+    refetch: refetchAll,
+  } = useTasks(activeDashboardId === "" || activeDashboardId === "all");
+
+  // Хук для задач по дашборду
+  const {
+    tasks: dbTasksList,
+    loading: dbLoading,
+    error: dbError,
+  } = useTasksByDB(
+      activeDashboardId !== "" && activeDashboardId !== "all"
+          ? activeDashboardId
+          : null
   );
 
-  // Выбираем задачи из нужного источника
-  const tasks = activeDashboardId === "" || activeDashboardId === "all" ? allTasks.tasks : tasksByDB.tasks;
-  const tasksLoading = allTasks.loading || tasksByDB.loading;
-  const tasksError = allTasks.error || tasksByDB.error;
+  // 🔁 Ре-фетч при повторном выборе "Все дашборды"
+  const prevDashboardId = useRef<string | null>(null);
+  useEffect(() => {
+    if (
+        activeDashboardId === "all" &&
+        prevDashboardId.current === "all"
+    ) {
+      refetchAll();
+    }
+    prevDashboardId.current = activeDashboardId;
+  }, [activeDashboardId, refetchAll]);
 
-  const { sortedTasks, sortField, sortOrder, toggleSort } = useSortedTasks(tasks);
+  const tasks =
+      activeDashboardId === "" || activeDashboardId === "all"
+          ? allTasksList
+          : dbTasksList;
+
+  const tasksLoading = allLoading || dbLoading;
+  const tasksError = allError || dbError;
+
+  const { sortedTasks, sortField, sortOrder, toggleSort } =
+      useSortedTasks(tasks);
 
   if (dashboardsLoading || tasksLoading)
     return <div className="p-4 text-gray-500">Загрузка...</div>;
 
   if (dashboardsError)
-    return <div className="p-4 text-red-500">Ошибка загрузки дашбордов: {dashboardsError}</div>;
+    return (
+        <div className="p-4 text-red-500">
+          Ошибка загрузки дашбордов: {dashboardsError}
+        </div>
+    );
 
   if (tasksError)
-    return <div className="p-4 text-red-500">Ошибка загрузки задач: {tasksError}</div>;
+    return (
+        <div className="p-4 text-red-500">
+          Ошибка загрузки задач: {tasksError}
+        </div>
+    );
 
-  const title = dashboards.find((d) => d.id === activeDashboardId)?.name ?? "Дашборд";
+  const title =
+      dashboards.find((d) => d.id === activeDashboardId)?.name ?? "Дашборд";
 
   return (
       <DashboardLayout
@@ -57,6 +97,5 @@ const DashboardView: React.FC<Props> = ({ dashboardId }) => {
       />
   );
 };
-
 
 export default DashboardView;

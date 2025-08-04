@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { useDashboard } from "@/hooks/useDashboard";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTasks } from "@/hooks/useTasks"; // ✅ добавили импорт
 
 /**
  * Выпадающий список для выбора дашборда.
@@ -18,6 +19,7 @@ const DashboardDropdown: React.FC = () => {
     } = useDashboard();
 
     const [open, setOpen] = useState(false);
+    const { refetch } = useTasks(); // ✅ получаем refetch для "Все дашборды"
 
     if (loading) {
         return (
@@ -35,7 +37,6 @@ const DashboardDropdown: React.FC = () => {
         );
     }
 
-    // Просто ищем выбранный дашборд в массиве из контекста
     const selectedDashboard = dashboards.find(
         (d) => d.id === selectedDashboardId
     );
@@ -43,6 +44,10 @@ const DashboardDropdown: React.FC = () => {
     const handleSelect = (id: string) => {
         setOpen(false);
         onDashboardChange(id);
+
+        if (id === "all") {
+            refetch(); // 🔁 обновляем задачи при выборе "Все дашборды"
+        }
     };
 
     return (
