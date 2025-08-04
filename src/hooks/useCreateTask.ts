@@ -1,69 +1,59 @@
-// tasker/src/hooks/useCreateTask.ts
+// hooks/useCreateTask.ts
 import { useState } from 'react';
 import API from '@/lib/axios';
 
-/**
- * Интерфейс для данных новой задачи, которые будут отправлены на сервер.
- */
-interface TaskData {
+// Тип данных, которые будут отправлены на сервер
+export interface CreateTaskPayload {
     title: string;
     description: string;
-    status: string;
-    reporterId: string;
-    deadline: string;
-    dashboardId: string;
+    deadline: string; // Добавлено поле deadline
+    dashboardID: string;
+    reporterID: string;
+    approveStatus: 'approved' | 'need-approval';
+    approverID: string;
+    blockers: string[];
 }
 
-/**
- * Интерфейс для ответа сервера после успешного создания задачи.
- */
-interface CreateTaskResponse {
-    message: string;
-    taskId: string;
-}
-
-/**
- * Кастомный React-хук useCreateTask:
- * - Управляет процессом создания новой задачи.
- * - Возвращает функцию createTask и состояния loading, error и success.
- */
 export const useCreateTask = () => {
-    // Состояние для индикации загрузки
-    const [loading, setLoading] = useState(false);
-    // Состояние для хранения сообщения об ошибке
+    const [loading, setLoading] = useState<boolean>(false);
+    const [success, setSuccess] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
-    // Состояние для отслеживания успешного завершения операции
-    const [success, setSuccess] = useState(false);
 
-    /**
-     * createTask:
-     * - Отправляет POST-запрос на /api/create с данными задачи.
-     * - Обрабатывает состояния загрузки, ошибок и успеха.
-     */
-    const createTask = async (taskData: TaskData) => {
-        // Сброс состояний перед началом нового запроса
+    const createTask = async (payload: CreateTaskPayload, isMock = true) => {
         setLoading(true);
-        setError(null);
         setSuccess(false);
+        setError(null);
 
         try {
-            // Отправляем POST-запрос с помощью настроенного axios
-            const response = await API.post<CreateTaskResponse>('/create', taskData);
+            if (isMock) {
+                // --- РЕЖИМ ИМИТАЦИИ (MOCK) ---
+                console.log("Имитация отправки данных:", payload);
+                await new Promise(resolve => setTimeout(resolve, 1500)); // Имитация задержки 1.5 секунды
 
-            if (response.status === 200) {
+                // Для проверки ошибки, раскомментируйте эту строку
+                // throw new Error("Имитированная ошибка сервера");
+
                 setSuccess(true);
-                return response.data;
+                // -----------------------------
             } else {
-                throw new Error('Не удалось создать задачу');
+                // --- РЕАЛЬНЫЙ РЕЖИМ ---
+                const response = await API.post('/create', payload);
+
+                if (response.status === 200 || response.status === 201) {
+                    setSuccess(true);
+                } else {
+                    setError('Failed to create task with status: ' + response.status);
+                }
             }
-        } catch (err: any) {
-            setError(err.response?.data?.message || 'Ошибка при создании задачи');
-            setSuccess(false);
-            return null;
+        } catch (err) {
+            // Обработка ошибок в реальном или имитированном режиме
+            const errorMessage = (err instanceof Error) ? err.message : 'An unexpected error occurred.';
+            setError(errorMessage);
+            console.error(err);
         } finally {
             setLoading(false);
         }
     };
 
-    return { createTask, loading, error, success };
+    return { createTask, loading, success, error };
 };

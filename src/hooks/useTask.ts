@@ -49,6 +49,10 @@ export function useTask(taskId: string | null): UseTaskResult {
                         // Ищем задачу по ID в моковых данных
                         const mockTask = mockTasks.find(t => t.id === taskId);
                         if (mockTask) {
+                            // Проверяем, что blockedBy является массивом
+                            if (mockTask.blockedBy === null) {
+                                mockTask.blockedBy = [];
+                            }
                             setTask(mockTask);
                         } else {
                             setError(`Моковая задача с ID "${taskId}" не найдена.`);
@@ -62,9 +66,15 @@ export function useTask(taskId: string | null): UseTaskResult {
             } else {
                 // Логика для реального API-запроса с использованием axios
                 try {
-                    // axios-интерцептор в src/lib/axios.ts автоматически добавит токен
                     const response = await API.get(`/task/by_id/${taskId}`);
-                    setTask(response.data);
+                    const taskData = response.data;
+
+                    // Проверяем, что blockedBy является массивом, иначе устанавливаем пустой массив
+                    if (taskData.blockedBy === null) {
+                        taskData.blockedBy = [];
+                    }
+
+                    setTask(taskData);
                 } catch (err: any) {
                     setError(err.response?.data?.message || 'Ошибка загрузки задачи');
                 } finally {
