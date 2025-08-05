@@ -2,6 +2,6 @@
 // этот файл содержит типы для дашбордов в приложении Tasker
 
 export interface Dashboard {
-  ID: string;
+  id: string;
   name: string;
 }

@@ -124,7 +124,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
           {/* Тело таблицы с задачами */}
           <tbody className="divide-y divide-gray-100">
-            {items.map((task) => {
+            {(items ?? []).map((task) => {
               // Проверяем, является ли статус задачи сортируемым
               const status = isSortableStatus(task.status) ? task.status : null;
 

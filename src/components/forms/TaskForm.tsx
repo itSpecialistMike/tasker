@@ -7,28 +7,21 @@ import { useFetchDashboards } from "@/hooks/useFetchDashboards";
 import { useUser } from "@/hooks/useUser";
 import { useUsers } from "@/hooks/useUsers";
 import { useCreateTask, CreateTaskPayload } from "@/hooks/useCreateTask";
+import { TaskFormData} from "@/types/TaskFormData";
 
 interface Props {
     onSuccess?: () => void;
 }
 
 // Тип данных для внутреннего состояния формы
-export interface TaskFormData {
-    title: string;
-    description: string;
-    deadline: string;
-    reporterId: string;
-    approverId: string;
-    approveStatus: 'approved' | 'need-approve';
-    dashboardId: string;
-    blockedBy: string[];
-}
+
 
 const TaskForm: React.FC<Props> = ({ onSuccess }) => {
     const { tasks } = useTasks();
-    const { data: dashboards } = useFetchDashboards();
+    const { data: dashboards = [] } = useFetchDashboards();
     const { user } = useUser();
     const { users } = useUsers();
+
 
     const { createTask, loading, success, error } = useCreateTask();
 
@@ -95,7 +88,7 @@ const TaskForm: React.FC<Props> = ({ onSuccess }) => {
 
         // 2. Отправка данных через хук
         // isMock установлен в true, чтобы имитировать запрос без реального эндпоинта
-        await createTask(payload, false);
+        await createTask(payload);
 
         // 3. Обработка успешного ответа
         if (success && onSuccess) {
@@ -166,11 +159,11 @@ const TaskForm: React.FC<Props> = ({ onSuccess }) => {
                 <label htmlFor="requireApproval" className="text-gray-700 font-medium">Требуется согласование?</label>
                 <select
                     id="requireApproval"
-                    value={form.approveStatus === "need-approve" ? "yes" : "no"}
+                    value={form.approveStatus === "need-approval" ? "yes" : "no"}
                     onChange={(e) => {
                         setForm((prev) => ({
                             ...prev,
-                            approveStatus: e.target.value === "yes" ? "need-approve" : "approved",
+                            approveStatus: e.target.value === "yes" ? "need-approval" : "approved",
                         }));
                     }}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -180,7 +173,7 @@ const TaskForm: React.FC<Props> = ({ onSuccess }) => {
                 </select>
             </div>
 
-            {form.approveStatus === "need-approve" && (
+            {form.approveStatus === "need-approval" && (
                 <div className="flex flex-col gap-2">
                     <label htmlFor="approverId" className="text-gray-700 font-medium">Утверждающий</label>
                     <select

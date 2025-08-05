@@ -1,4 +1,3 @@
-// tasker/src/app/layout.tsx
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -8,6 +7,7 @@ import { DashboardProvider } from "@/context/DashboardContext";
 import Footer from "@/components/Footer";
 import { ModalProvider } from "@/context/ModalContext";
 import { UserProvider } from "@/context/UserContext";
+import { ReactQueryProvider } from "@/lib/react-query-provider"; // 👈 добавили
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -31,20 +31,19 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-        {/* Добавляем классы flex, flex-col и min-h-screen, чтобы body стал flex-контейнером, растягивающимся на всю высоту */}
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}>
         <BackgroundBlur />
-        <ModalProvider>
-            <UserProvider>
-            <DashboardProvider>
-                <Header />
-                <main className="flex-grow">
-                    {children}
-                </main>
-            <Footer />
-            </DashboardProvider>
-            </UserProvider>
-        </ModalProvider>
+        <ReactQueryProvider>
+            <ModalProvider>
+                <UserProvider>
+                    <DashboardProvider>
+                        <Header />
+                        <main className="flex-grow">{children}</main>
+                        <Footer />
+                    </DashboardProvider>
+                </UserProvider>
+            </ModalProvider>
+        </ReactQueryProvider>
         </body>
         </html>
     );

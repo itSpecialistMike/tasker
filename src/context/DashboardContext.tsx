@@ -9,7 +9,7 @@ import React, {
     useEffect,
 } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useFetchDashboards } from "@/hooks/useFetchDashboards"; // Импортируем хук для загрузки дашбордов
+import { useFetchDashboards } from "@/hooks/useFetchDashboards";
 import { Dashboard } from "@/types/dashboard";
 
 interface DashboardContextType {
@@ -17,8 +17,8 @@ interface DashboardContextType {
     onDashboardChange: (id: string) => void;
     dashboards: Dashboard[];
     loading: boolean;
-    error: string | null;
-    refetchDashboards: () => Promise<void>;
+    error: Error | null;
+    refetchDashboards: () => Promise<unknown>;
 }
 
 export const DashboardContext = createContext<DashboardContextType | undefined>(
@@ -33,33 +33,39 @@ export const DashboardProvider: React.FC<DashboardProviderProps> = ({ children }
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    const { data: dashboards = [], loading, error, refetchDashboards } = useFetchDashboards();
+    const {
+        data: dashboards = [],
+        isLoading: loading,
+        error,
+        refetch: refetchDashboards,
+    } = useFetchDashboards();
 
-    // Локальное состояние выбранного дашборда
     const [selectedDashboardId, setSelectedDashboardId] = useState<string>("");
 
-    // Считываем ID из URL (если есть)
     const dashboardIdFromUrl = searchParams?.get("dashboardId") ?? "";
 
-    // Устанавливаем выбранный дашборд после загрузки данных
     useEffect(() => {
         if (!loading && dashboards.length > 0 && selectedDashboardId === "") {
-            const initialId = dashboardIdFromUrl || dashboards[0].id;
+            const validIds = dashboards.map(d => d.id);
+            const initialId = validIds.includes(dashboardIdFromUrl) ? dashboardIdFromUrl : "all";
             setSelectedDashboardId(initialId);
         }
-    }, [loading, dashboards.length, dashboardIdFromUrl, selectedDashboardId]);
+    }, [loading, dashboards, dashboardIdFromUrl, selectedDashboardId]);
 
-    // Обработчик смены дашборда, обновляет состояние и URL
     const onDashboardChange = useCallback(
         (id: string) => {
-            if (id === selectedDashboardId) return; // Если выбран тот же дашборд, не делаем ничего
+            if (id === selectedDashboardId) return;
             setSelectedDashboardId(id);
-            router.push(`/?dashboardId=${id}`, undefined, { shallow: true });
+
+            if (id === "all") {
+                router.push(`/`, undefined);
+            } else {
+                router.push(`/?dashboardId=${id}`, undefined);
+            }
         },
         [router, selectedDashboardId]
     );
 
-    // Мемоизируем значение контекста, чтобы не создавать его заново без нужды
     const value = React.useMemo(
         () => ({
             selectedDashboardId,
@@ -81,7 +87,7 @@ export const DashboardProvider: React.FC<DashboardProviderProps> = ({ children }
 
 export const useDashboard = () => {
     const context = useContext(DashboardContext);
-    if (context === undefined) {
+    if (!context) {
         throw new Error("useDashboard must be used within a DashboardProvider");
     }
     return context;

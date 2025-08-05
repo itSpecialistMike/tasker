@@ -12,7 +12,7 @@ type Props = {
 const DashboardView: React.FC<Props> = ({ dashboardId }) => {
   const {
     data: dashboards = [],
-    loading: dashboardsLoading,
+    isLoading: dashboardsLoading,
     error: dashboardsError,
   } = useFetchDashboards();
 
@@ -23,27 +23,30 @@ const DashboardView: React.FC<Props> = ({ dashboardId }) => {
               ? dashboards[0].id
               : "";
 
-  // Вызываем оба хука всегда
-  const allTasks = useTasks(activeDashboardId === "" || activeDashboardId === "all");
-  const tasksByDB = useTasksByDB(
-      activeDashboardId !== "" && activeDashboardId !== "all" ? activeDashboardId : null
-  );
+  const isAllDashboardsSelected = activeDashboardId === "" || activeDashboardId === "all";
 
-  // Выбираем задачи из нужного источника
-  const tasks = activeDashboardId === "" || activeDashboardId === "all" ? allTasks.tasks : tasksByDB.tasks;
-  const tasksLoading = allTasks.loading || tasksByDB.loading;
-  const tasksError = allTasks.error || tasksByDB.error;
+  const allTasks = useTasks(isAllDashboardsSelected);
+  const tasksByDB = useTasksByDB(!isAllDashboardsSelected ? activeDashboardId : null);
+
+  const tasks = isAllDashboardsSelected ? allTasks.tasks : tasksByDB.data ?? [];
+  const tasksLoading = allTasks.loading || tasksByDB.isLoading;
+  const tasksError = allTasks.error || tasksByDB.error?.message;
 
   const { sortedTasks, sortField, sortOrder, toggleSort } = useSortedTasks(tasks);
 
-  if (dashboardsLoading || tasksLoading)
+  if (dashboardsLoading || tasksLoading) {
     return <div className="p-4 text-gray-500">Загрузка...</div>;
+  }
 
-  if (dashboardsError)
-    return <div className="p-4 text-red-500">Ошибка загрузки дашбордов: {dashboardsError}</div>;
 
-  if (tasksError)
+
+  if (dashboardsError) {
+    return <div className="p-4 text-red-500">Ошибка загрузки дашбордов: {dashboardsError.message}</div>;
+  }
+
+  if (tasksError) {
     return <div className="p-4 text-red-500">Ошибка загрузки задач: {tasksError}</div>;
+  }
 
   const title = dashboards.find((d) => d.id === activeDashboardId)?.name ?? "Дашборд";
 

@@ -27,7 +27,7 @@ export default function TaskPage() {
   const taskId = params?.id as string;
 
   // ✔️ Используем новый хук useTask для получения одной задачи по ID
-  const { task, loading, error } = useTask(taskId);
+  const { data: task, isLoading: loading, error } = useTask(taskId);
   const { onDashboardChange, selectedDashboardId } = useDashboard();
 
   // ✔️ Используем useEffect для обновления контекста дашборда
@@ -41,10 +41,10 @@ export default function TaskPage() {
 
   // Обработка состояний загрузки и ошибок
   if (loading) return <p>Загрузка...</p>;
-  if (error) return <p className="text-red-500">Ошибка загрузки задачи: {error}</p>;
+  if (error) return <p className="text-red-500">Ошибка загрузки задачи: {error.message}</p>;
 
   if (!task) {
-    return <p className="text-gray-500">Задача с ID "{taskId}" не найдена.</p>;
+    return <p className="text-gray-500">Задача с ID {taskId} не найдена.</p>;
   }
 
   return (

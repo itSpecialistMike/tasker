@@ -1,44 +1,33 @@
-import { useState, useEffect, useCallback } from "react";
-import { Task } from "@/types/task";
+import { useQuery } from "@tanstack/react-query";
 import API from "@/lib/axios";
+import { Task } from "@/types/task";
 
-export const useTasks = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+const fetchTasks = async (): Promise<Task[]> => {
+  const response = await API.get("/list");
+  if (response.status !== 200) {
+    throw new Error("Ошибка загрузки задач");
+  }
+  return response.data;
+};
 
-  // Оборачиваем fetchTasks в useCallback, чтобы избежать лишних перерендеров
-  const fetchTasks = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    setTasks([]);
+export const useTasks = (enabled: boolean = true) => {
+  const {
+    data: tasks = [],
+    isLoading: loading,
+    isError,
+    error,
+    refetch,
+  } = useQuery<Task[], Error>({
+    queryKey: ["tasks"],
+    queryFn: fetchTasks,
+    enabled, // 👈 только если true — выполнится запрос
 
-    try {
-      const response = await API.get("/list");
-
-      if (response.status !== 200) {
-        throw new Error("Ошибка загрузки задач");
-      }
-
-      setTasks(response.data);
-    } catch (err: any) {
-      const errorMessage =
-          err.response?.data?.error || err.message || "Неизвестная ошибка";
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Загружаем при инициализации
-  useEffect(() => {
-    fetchTasks();
-  }, [fetchTasks]);
+  });
 
   return {
     tasks,
     loading,
-    error,
-    refetch: fetchTasks, // Можно использовать вручную или извне
+    error: isError ? error.message : null,
+    refetch,
   };
 };

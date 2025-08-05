@@ -1,33 +1,29 @@
-import { useState, useEffect } from 'react';
-import API from '@/lib/axios';
+import { useQuery } from "@tanstack/react-query";
+import API from "@/lib/axios";
 
 export interface User {
   id: string;
   login: string;
   name: string;
-  // другие поля, если есть
 }
 
 export const useUsers = () => {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    data: users = [],
+    isLoading: loading,
+    isError,
+    error,
+  } = useQuery<User[], Error>({
+    queryKey: ["users"],
+    queryFn: async () => {
+      const response = await API.get<User[]>("/Users");
+      return response.data;
+    },
+  });
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await API.get<User[]>('/Users');
-        setUsers(response.data);
-      } catch (err) {
-        setError('Не удалось загрузить пользователей.');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUsers();
-  }, []); // Пустой массив зависимостей означает, что эффект выполнится только один раз при монтировании компонента
-
-  return { users, loading, error };
+  return {
+    users,
+    loading,
+    error: isError ? error.message : null,
+  };
 };

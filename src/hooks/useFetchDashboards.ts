@@ -1,51 +1,28 @@
-// src/hooks/useFetchDashboards.ts
-import { useState, useEffect } from "react";
-import { Dashboard } from '@/types/dashboard';
+import { useQuery } from '@tanstack/react-query';
 import API from '@/lib/axios';
+import { Dashboard } from '@/types/dashboard';
+
+const normalizeDashboards = (dashboardsFromBackend: any[]): Dashboard[] => {
+    return dashboardsFromBackend.map(d => ({
+        id: d.ID ?? d.id,
+        name: d.name,
+    }));
+};
 
 export const useFetchDashboards = () => {
-    const [data, setData] = useState<Dashboard[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    // Нормализация ID в формат с маленькой буквы
-    const normalizeDashboards = (dashboardsFromBackend: any[]): Dashboard[] => {
-        return dashboardsFromBackend.map(d => ({
-            id: d.ID ?? d.id,
-            name: d.name,
-        }));
-    };
-
-    const fetchDashboard = async () => {
-        setLoading(true);
-        setError(null);
-
-        try {
+    const query = useQuery<Dashboard[], Error>({
+        queryKey: ['dashboards'],
+        queryFn: async () => {
             const response = await API.get('/showDB');
+            if (!Array.isArray(response.data)) return [];
+            return [{ id: 'all', name: 'Все дашборды' }, ...normalizeDashboards(response.data)];
+        },
+    });
 
-            const dashboards = Array.isArray(response.data)
-                ? normalizeDashboards(response.data)
-                : [];
+    if (query.error) {
+        console.error('Ошибка при загрузке дашбордов:', query.error);
+    }
 
-            // Всегда добавляем "Все дашборды" в начало
-            setData([{ id: "all", name: "Все дашборды" }, ...dashboards]);
-        } catch (error: any) {
-            setError(error.message || 'Ошибка при загрузке дашбордов');
-            // Даже в случае ошибки "Все дашборды" остаётся
-            setData([{ id: "all", name: "Все дашборды" }]);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchDashboard();
-    }, []);
-
-    return {
-        data,
-        loading,
-        error,
-        refetchDashboards: fetchDashboard,
-    };
+    return query;
 };
+

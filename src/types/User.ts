@@ -1,4 +1,4 @@
-// src/types/user.ts
+// src/types/User.ts
 // этот файл содержит типы для пользователей в приложении Tasker
 
 export interface User {
