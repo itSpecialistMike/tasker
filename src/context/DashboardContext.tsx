@@ -14,7 +14,7 @@ import { Dashboard } from "@/types/dashboard";
 
 interface DashboardContextType {
     selectedDashboardId: string;
-    onDashboardChange: (id: string) => void;
+    onDashboardChange: (id: string, options?: { navigate?: boolean }) => void;
     dashboards: Dashboard[];
     loading: boolean;
     error: Error | null;
@@ -53,14 +53,18 @@ export const DashboardProvider: React.FC<DashboardProviderProps> = ({ children }
     }, [loading, dashboards, dashboardIdFromUrl, selectedDashboardId]);
 
     const onDashboardChange = useCallback(
-        (id: string) => {
+        (id: string, options?: { navigate?: boolean }) => {
+            console.log('onDashboardChange', id, 'navigate:', options?.navigate);
             if (id === selectedDashboardId) return;
             setSelectedDashboardId(id);
 
-            if (id === "all") {
-                router.push(`/`, undefined);
-            } else {
-                router.push(`/?dashboardId=${id}`, undefined);
+            // Corrected navigation logic.
+            if (options?.navigate) {
+                if (id === "all") {
+                    router.push(`/`);
+                } else {
+                    router.push(`/?dashboardId=${id}`);
+                }
             }
         },
         [router, selectedDashboardId]

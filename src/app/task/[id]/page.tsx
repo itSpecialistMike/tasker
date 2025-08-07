@@ -1,45 +1,24 @@
 // tasker/src/app/task/[id]/page.tsx
 'use client';
 
-/**
- * Импортируем хуки и компоненты:
- * - useParams из next/navigation для получения ID из URL
- * - useEffect из react для управления состоянием
- * - TaskDetails и TaskLayout для отображения деталей задачи
- * - useTask — новый хук для загрузки отдельной задачи
- * - useDashboard — кастомный хук для работы с контекстом дашборда
- */
 import { useParams } from 'next/navigation';
-import { useEffect } from 'react';
 import TaskDetails from '@/components/taskComponents/TaskDetails';
 import TaskLayout from '@/components/taskComponents/TaskLayout';
-import { useTask } from "@/hooks/useTask"; // ✔️ Импортируем новый хук
-import { useDashboard } from "@/hooks/useDashboard";
+import { useTask } from "@/hooks/useTask";
 
-/**
- * Компонент TaskPage:
- * - Основная страница для просмотра деталей отдельной задачи
- * - Получает ID задачи из URL
- * - Использует хук useTask для загрузки данных
- */
+// Убрали useDashboard и useEffect, так как логика перенесена
+// import { useDashboard } from "@/hooks/useDashboard";
+
 export default function TaskPage() {
   const params = useParams();
   const taskId = params?.id as string;
 
-  // ✔️ Используем новый хук useTask для получения одной задачи по ID
   const { data: task, isLoading: loading, error } = useTask(taskId);
-  const { onDashboardChange, selectedDashboardId } = useDashboard();
+  // Убрали useDashboard, потому что на этой странице он больше не нужен
+  // const { onDashboardChange, selectedDashboardId } = useDashboard();
 
-  // ✔️ Используем useEffect для обновления контекста дашборда
-  useEffect(() => {
-    // Обновляем контекст, только если ID дашборда задачи
-    // отличается от текущего, чтобы избежать лишних изменений URL.
-    if (task?.dashboardId && task.dashboardId !== selectedDashboardId) {
-      onDashboardChange(task.dashboardId);
-    }
-  }, [task, onDashboardChange, selectedDashboardId]);
+  // Убрали useEffect, потому что логика перенесена в DashboardLayout
 
-  // Обработка состояний загрузки и ошибок
   if (loading) return <p>Загрузка...</p>;
   if (error) return <p className="text-red-500">Ошибка загрузки задачи: {error.message}</p>;
 

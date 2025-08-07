@@ -1,26 +1,42 @@
+// Указание, что этот компонент должен выполняться на стороне клиента.
 "use client";
 
-import DashboardDropdown from "./DashboardDropdown";
-import { useModal } from "@/context/ModalContext";
-import TaskForm from "@/components/forms/TaskForm";
-import { useUserContext } from "@/context/UserContext";
+import DashboardDropdown from "./DashboardDropdown"; // Импортируем компонент выпадающего списка дашбордов.
+import { useModal } from "@/context/ModalContext"; // Импортируем хук для управления модальными окнами.
+import TaskForm from "@/components/forms/TaskForm"; // Импортируем компонент формы для создания задачи.
+import { useUserContext } from "@/context/UserContext"; // Импортируем хук для доступа к данным пользователя.
 
 /**
- * Компонент NavDesktop:
- * - Показывает меню только авторизованным пользователям
+ * Компонент NavDesktop.
+ * Этот компонент представляет собой навигационное меню, предназначенное для отображения
+ * на экранах большого размера (desktop).
+ *
+ * Основные функции:
+ * - Проверяет статус авторизации пользователя. Меню отображается только для авторизованных пользователей.
+ * - Показывает выпадающий список для выбора дашборда.
+ * - Предоставляет кнопку для создания новой задачи, которая открывает модальное окно с формой.
  */
 const NavDesktop: React.FC = () => {
+    // Получаем функцию для открытия модального окна из контекста.
     const { openModal } = useModal();
+    // Получаем данные о пользователе и статус загрузки из контекста пользователя.
     const { user, loading } = useUserContext();
 
+    // Если данные о пользователе ещё загружаются или пользователь не авторизован,
+    // компонент ничего не возвращает (не отображается).
     if (loading || !user) {
-        return null; // не показываем меню, пока идёт загрузка или если неавторизован
+        return null;
     }
 
+    // Если пользователь авторизован, отображаем навигационное меню.
     return (
         <nav className="hidden md:flex items-center text-gray-700">
+            {/* Компонент выпадающего списка дашбордов */}
             <DashboardDropdown />
+
+            {/* Кнопка "Создать задачу", которая при клике открывает модальное окно */}
             <button
+                // При клике вызываем функцию openModal и передаём ей компонент TaskForm.
                 onClick={() => openModal(<TaskForm />)}
                 className="flex items-center px-4 py-2 rounded-2xl hover:bg-gray-100 hover:scale-105 transform duration-300"
             >
@@ -30,4 +46,4 @@ const NavDesktop: React.FC = () => {
     );
 };
 
-export default NavDesktop;
+export default NavDesktop; // Экспортируем компонент для использования в других частях приложения.

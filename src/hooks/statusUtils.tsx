@@ -2,7 +2,7 @@
 // Этот файл содержит утилиты для работы со статусами задач в приложении Tasker
 import React from "react";
 import { BadgeCheck, Hourglass, XCircle, CheckCircle } from "lucide-react";
-import type { SortableStatus } from "../types/task";
+import type { SortableStatus } from "@/types/task";
 
 /**
  * Порядок сортировки статусов задач
