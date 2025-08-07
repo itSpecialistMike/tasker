@@ -10,20 +10,7 @@ import React, {
 } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useFetchDashboards } from "@/hooks/useFetchDashboards";
-import { Dashboard } from "@/types/dashboard";
-
-/**
- * Определение типа для объекта контекста дашбордов.
- * Он предоставляет состояние и функции для управления выбранным дашбордом.
- */
-interface DashboardContextType {
-    selectedDashboardId: string;
-    onDashboardChange: (id: string, options?: { navigate?: boolean }) => void;
-    dashboards: Dashboard[];
-    loading: boolean;
-    error: Error | null;
-    refetchDashboards: () => Promise<unknown>;
-}
+import { DashboardContextType } from "@/types/dashboardContextType";
 
 /**
  * Создание контекста с начальным значением undefined.

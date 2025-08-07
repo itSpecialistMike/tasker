@@ -4,7 +4,10 @@ import API from "@/lib/axios";
 export interface User {
   id: string;
   login: string;
+  surname: string;
   name: string;
+  middlename: string;
+  roleID: number;
 }
 
 export const useUsers = () => {

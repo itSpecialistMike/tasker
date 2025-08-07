@@ -7,18 +7,12 @@ import { AnimatePresence, motion } from "framer-motion"; // Библиотека
 import { ChevronDown, LogOut, User as UserIcon, UserPlus } from "lucide-react"; // Импорт иконок.
 import { useRouter } from 'next/navigation'; // Хук Next.js для программной навигации.
 import { useUserContext } from "@/context/UserContext"; // Импорт кастомного хука для доступа к данным пользователя.
+import { User } from '@/types/user'
 
 /**
  * Интерфейс для данных пользователя.
  * Описывает структуру объекта пользователя, получаемого после аутентификации.
  */
-interface User {
-    id: number;
-    name: string;
-    surname: string;
-    login: string;
-    roleID: number;
-}
 
 /**
  * Компонент ProfileButton.
@@ -85,7 +79,7 @@ const ProfileButton = () => {
                             {/* Секция с информацией о пользователе */}
                             <div className="py-2 px-4 border-b border-gray-100">
                                 <p className="text-sm font-medium text-gray-900">
-                                    {user.name} {user.surname}
+                                    {user.name} {user.surname} {user.middlename}
                                 </p>
                                 <p className="text-xs text-gray-500">
                                     @{user.login}

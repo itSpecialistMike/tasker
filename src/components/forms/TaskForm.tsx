@@ -187,7 +187,7 @@ const TaskForm: React.FC<Props> = ({ onSuccess }) => {
                         <option value="" disabled>Выберите утверждающего</option>
                         {users.map((u) => (
                             <option key={u.id} value={u.id}>
-                                {u.name}
+                                {u.name} {u.surname} {u.middlename} {u.roleID}
                             </option>
                         ))}
                     </select>
