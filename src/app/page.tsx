@@ -1,4 +1,4 @@
-// tasker/src/app/page.tsx
+// tasker/src/app/page.tsx.tsx
 "use client";
 
 import DashboardView from "@/components/dashBoardComponents/DashboardView";

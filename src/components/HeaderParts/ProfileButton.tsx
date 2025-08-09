@@ -1,3 +1,4 @@
+// tasker/src/components/ProfileButton.tsx
 // Указывает, что этот компонент должен выполняться на стороне клиента.
 "use client";
 
@@ -7,19 +8,11 @@ import { AnimatePresence, motion } from "framer-motion"; // Библиотека
 import { ChevronDown, LogOut, User as UserIcon, UserPlus } from "lucide-react"; // Импорт иконок.
 import { useRouter } from 'next/navigation'; // Хук Next.js для программной навигации.
 import { useUserContext } from "@/context/UserContext"; // Импорт кастомного хука для доступа к данным пользователя.
-import { User } from '@/types/user'
+import useLogout from "@/hooks/useLogout";
+import { useQueryClient } from "@tanstack/react-query";
+import { useTasks } from "@/hooks/useTasks"; // 👈 Импортируем хук useTasks
+import { useDashboard } from "@/hooks/useDashboard"; // 👈 Импортируем хук useDashboard
 
-/**
- * Интерфейс для данных пользователя.
- * Описывает структуру объекта пользователя, получаемого после аутентификации.
- */
-
-/**
- * Компонент ProfileButton.
- * Этот компонент отображает кнопку профиля, которая меняется в зависимости от
- * статуса аутентификации пользователя (авторизован или нет). При клике
- * открывается выпадающее меню с опциями.
- */
 const ProfileButton = () => {
     // Состояние для управления видимостью выпадающего меню.
     const [isOpen, setIsOpen] = useState(false);
@@ -27,46 +20,62 @@ const ProfileButton = () => {
     const router = useRouter();
     // Получение данных пользователя и статуса загрузки из контекста.
     const { user, loading } = useUserContext();
+    const logout = useLogout();
+    const queryClient = useQueryClient();
+
+    // 💡 Корректное получение функции refetch из хука useDashboard
+    const { refetchDashboards } = useDashboard();
+    // 💡 Получение функции refetch из хука useTasks
+    const { refetch: refetchTasks } = useTasks();
 
     // Функция для закрытия выпадающего меню.
     const handleClose = () => setIsOpen(false);
 
     /**
      * Обработчик выхода из системы.
-     * Закрывает меню и перенаправляет пользователя на страницу входа.
-     * В реальном приложении здесь должен быть вызов API для очистки сессии на сервере.
      */
-    const handleLogout = () => {
-        handleClose();
-        router.push('/login'); // Перенаправляем на страницу входа.
-        // TODO: Добавить вызов API для выхода из системы, чтобы сервер очистил куки сессии.
-        // Например: API.post('/api/logout');
+    const handleLogout = async () => {
+        try {
+            await logout();
+
+            // Явно очищаем кэш запроса "currentUser"
+            queryClient.setQueryData(["currentUser"], null);
+
+            // Запускаем рефетч для дашбордов и задач.
+            // Это обновит их состояние в соответствии с новым статусом пользователя (не авторизован).
+            // Запросы в useTasks и useFetchDashboards не будут выполнены, если токен отсутствует.
+            refetchDashboards();
+            refetchTasks();
+
+            // Закрываем выпадающее меню
+            handleClose();
+
+            // Перенаправление на главную страницу, если это необходимо
+            // router.push('/');
+        } catch (error) {
+            console.error("Ошибка при выходе из системы", error);
+        }
     };
 
     // --- Логика рендеринга в зависимости от состояния ---
-
-    // Если данные пользователя загружаются, отображаем "скелетон" (пульсирующий кружок).
     if (loading) {
         return <div className="w-10 h-10 rounded-full bg-gray-200 animate-pulse" />;
     }
 
-    // Если пользователь авторизован (объект user существует), отображаем меню профиля.
     if (user) {
         return (
             <div className="relative inline-block text-left">
-                {/* Кнопка для открытия/закрытия меню */}
                 <button
                     onClick={() => setIsOpen(!isOpen)}
                     className="flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-900 text-white hover:bg-indigo-700 transition-colors transform duration-300"
-                    aria-haspopup="true" // Атрибут для доступности, указывает, что кнопка открывает выпадающее меню.
-                    aria-expanded={isOpen} // Атрибут для доступности, указывает, открыто ли меню.
+                    aria-haspopup="true"
+                    aria-expanded={isOpen}
                 >
                     <span className="font-bold hidden sm:inline">
                         Привет, {user.login}
                     </span>
                     <UserIcon size={18} />
                 </button>
-                {/* Контейнер для анимации выпадающего меню */}
                 <AnimatePresence>
                     {isOpen && (
                         <motion.div
@@ -74,9 +83,8 @@ const ProfileButton = () => {
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: -10 }}
                             transition={{ duration: 0.2 }}
-                            className="absolute right-0 mt-2 w-56 origin-top-right rounded-2xl bg-white shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+                            className="absolute right-0 mt-2 w-56 origin-top-right rounded-2xl bg-white shadow-xl z-50"
                         >
-                            {/* Секция с информацией о пользователе */}
                             <div className="py-2 px-4 border-b border-gray-100">
                                 <p className="text-sm font-medium text-gray-900">
                                     {user.name} {user.surname} {user.middlename}
@@ -85,9 +93,7 @@ const ProfileButton = () => {
                                     @{user.login}
                                 </p>
                             </div>
-                            {/* Секция с кнопками-ссылками */}
                             <div className="py-1">
-                                {/* Ссылка на страницу профиля */}
                                 <Link
                                     href="/profile"
                                     onClick={handleClose}
@@ -96,7 +102,6 @@ const ProfileButton = () => {
                                     <UserIcon size={16} />
                                     <span>Профиль</span>
                                 </Link>
-                                {/* Кнопка "Выйти" */}
                                 <button
                                     onClick={handleLogout}
                                     className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
@@ -112,10 +117,8 @@ const ProfileButton = () => {
         );
     }
 
-    // Если пользователь не авторизован (user === null), отображаем меню входа/регистрации.
     return (
         <div className="relative inline-block text-left">
-            {/* Кнопка для открытия/закрытия меню */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-900 text-white hover:bg-indigo-700 transition-colors transform duration-300"
@@ -125,7 +128,6 @@ const ProfileButton = () => {
                 <span className="font-bold hidden sm:inline">Войти</span>
                 <ChevronDown size={18} />
             </button>
-            {/* Контейнер для анимации выпадающего меню */}
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
@@ -136,7 +138,6 @@ const ProfileButton = () => {
                         className="absolute right-0 mt-2 w-48 origin-top-right rounded-2xl bg-white shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
                     >
                         <div className="py-1">
-                            {/* Ссылка на страницу авторизации */}
                             <Link
                                 href="/login"
                                 onClick={handleClose}
@@ -145,7 +146,6 @@ const ProfileButton = () => {
                                 <UserIcon size={16} />
                                 <span>Авторизация</span>
                             </Link>
-                            {/* Ссылка на страницу регистрации */}
                             <Link
                                 href="/register"
                                 onClick={handleClose}
@@ -162,4 +162,4 @@ const ProfileButton = () => {
     );
 };
 
-export default ProfileButton; // Экспортируем компонент.
+export default ProfileButton;

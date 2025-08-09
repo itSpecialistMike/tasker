@@ -1,4 +1,4 @@
-// app/register/page.tsx
+// app/register/page.tsx.tsx
 import Register from "@/components/forms/RegisterForm";
 import BackgroundBlur from "@/components/BackgroundBlur";
 

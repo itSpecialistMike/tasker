@@ -220,7 +220,7 @@ const TaskForm: React.FC<Props> = ({ onSuccess }) => {
                     >
                         {tasks.map((task) => (
                             <option key={task.id} value={task.id}>
-                                {task.title}
+                                {task.dashboardId} {task.title} {task.description}
                             </option>
                         ))}
                     </select>
