@@ -56,9 +56,9 @@ export default function RegisterForm() {
   };
 
   return (
-      <div className="flex flex-col items-center justify-center min-h-screen px-4 bg-black/40 backdrop-blur-sm">
+      <div className="flex flex-col items-center min-h-screen px-4 bg-black/40 backdrop-blur-sm">
         {/* Обёртка формы */}
-        <div className="bg-white p-8 rounded-4xl shadow-2xl w-full max-w-md">
+        <div className="bg-white p-8 mt-20 rounded-4xl shadow-2xl w-full max-w-md">
           <h2 className="text-2xl font-bold mb-6 text-center">Регистрация</h2>
 
           {/* Отображение ошибки сервера */}

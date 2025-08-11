@@ -5,6 +5,7 @@ import DashboardView from "@/components/dashBoardComponents/DashboardView";
 import { useDashboard } from "@/hooks/useDashboard";
 import { useUserContext } from "@/context/UserContext"; // <-- Исправлено: используем useUserContext
 import UnauthorizedMessage from "@/components/UnauthorizedMessage";
+import LoadingComp from "@/components/loadingComp";
 
 export default function Home() {
     const { selectedDashboardId } = useDashboard();
@@ -12,7 +13,7 @@ export default function Home() {
 
     // Логика условного рендеринга
     if (loading) {
-        return <div className="flex items-center justify-center min-h-screen">Загрузка данных пользователя...</div>;
+        return <LoadingComp />;
     }
 
     if (!user) {

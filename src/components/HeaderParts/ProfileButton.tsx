@@ -10,12 +10,14 @@ import useLogout from "@/hooks/useLogout";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTasks } from "@/hooks/useTasks";
 import { useDashboard } from "@/hooks/useDashboard";
+import { useRouter } from 'next/navigation';
 
 const ProfileButton = () => {
     const [isOpen, setIsOpen] = useState(false);
     const { user, loading } = useUserContext();
     const logout = useLogout();
     const queryClient = useQueryClient();
+    const router = useRouter();
 
     // 💡 Исправлено: вызываем useTasks с опцией { enabled: false }
     // Это предотвратит автоматический запрос, но даст доступ к refetch.
@@ -34,8 +36,8 @@ const ProfileButton = () => {
 
             // Вызываем refetch. Благодаря опции 'enabled' в хуках,
             // запросы на сервер не будут выполнены, так как user будет null.
-            refetchDashboards();
-            refetchTasks();
+            await router.push("/");
+
 
             handleClose();
         } catch (error) {

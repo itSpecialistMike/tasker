@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import TaskDetails from '@/components/taskComponents/TaskDetails';
 import TaskLayout from '@/components/taskComponents/TaskLayout';
 import { useTask } from "@/hooks/useTask";
+import LoadingComp from "@/components/loadingComp";
 
 // Убрали useDashboard и useEffect, так как логика перенесена
 // import { useDashboard } from "@/hooks/useDashboard";
@@ -19,7 +20,7 @@ export default function TaskPage() {
 
   // Убрали useEffect, потому что логика перенесена в DashboardLayout
 
-  if (loading) return <p>Загрузка...</p>;
+  if (loading) return <LoadingComp />;
   if (error) return <p className="text-red-500">Ошибка загрузки задачи: {error.message}</p>;
 
   if (!task) {
