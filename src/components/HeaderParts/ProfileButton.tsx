@@ -1,63 +1,48 @@
 // tasker/src/components/ProfileButton.tsx
-// Указывает, что этот компонент должен выполняться на стороне клиента.
 "use client";
 
-import Link from "next/link"; // Компонент Next.js для навигации.
-import { useState } from "react"; // Хук для управления состоянием.
-import { AnimatePresence, motion } from "framer-motion"; // Библиотека для анимации UI.
-import { ChevronDown, LogOut, User as UserIcon, UserPlus } from "lucide-react"; // Импорт иконок.
-import { useRouter } from 'next/navigation'; // Хук Next.js для программной навигации.
-import { useUserContext } from "@/context/UserContext"; // Импорт кастомного хука для доступа к данным пользователя.
+import Link from "next/link";
+import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronDown, LogOut, User as UserIcon, UserPlus } from "lucide-react";
+import { useUserContext } from "@/context/UserContext";
 import useLogout from "@/hooks/useLogout";
 import { useQueryClient } from "@tanstack/react-query";
-import { useTasks } from "@/hooks/useTasks"; // 👈 Импортируем хук useTasks
-import { useDashboard } from "@/hooks/useDashboard"; // 👈 Импортируем хук useDashboard
+import { useTasks } from "@/hooks/useTasks";
+import { useDashboard } from "@/hooks/useDashboard";
 
 const ProfileButton = () => {
-    // Состояние для управления видимостью выпадающего меню.
     const [isOpen, setIsOpen] = useState(false);
-    // Инициализация роутера для навигации.
-    const router = useRouter();
-    // Получение данных пользователя и статуса загрузки из контекста.
     const { user, loading } = useUserContext();
     const logout = useLogout();
     const queryClient = useQueryClient();
 
+    // 💡 Исправлено: вызываем useTasks с опцией { enabled: false }
+    // Это предотвратит автоматический запрос, но даст доступ к refetch.
+    const { refetch: refetchTasks } = useTasks({ enabled: false });
+
     // 💡 Корректное получение функции refetch из хука useDashboard
     const { refetchDashboards } = useDashboard();
-    // 💡 Получение функции refetch из хука useTasks
-    const { refetch: refetchTasks } = useTasks();
 
-    // Функция для закрытия выпадающего меню.
     const handleClose = () => setIsOpen(false);
 
-    /**
-     * Обработчик выхода из системы.
-     */
     const handleLogout = async () => {
         try {
             await logout();
 
-            // Явно очищаем кэш запроса "currentUser"
             queryClient.setQueryData(["currentUser"], null);
 
-            // Запускаем рефетч для дашбордов и задач.
-            // Это обновит их состояние в соответствии с новым статусом пользователя (не авторизован).
-            // Запросы в useTasks и useFetchDashboards не будут выполнены, если токен отсутствует.
+            // Вызываем refetch. Благодаря опции 'enabled' в хуках,
+            // запросы на сервер не будут выполнены, так как user будет null.
             refetchDashboards();
             refetchTasks();
 
-            // Закрываем выпадающее меню
             handleClose();
-
-            // Перенаправление на главную страницу, если это необходимо
-            // router.push('/');
         } catch (error) {
             console.error("Ошибка при выходе из системы", error);
         }
     };
 
-    // --- Логика рендеринга в зависимости от состояния ---
     if (loading) {
         return <div className="w-10 h-10 rounded-full bg-gray-200 animate-pulse" />;
     }
@@ -135,7 +120,7 @@ const ProfileButton = () => {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: -10 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute right-0 mt-2 w-48 origin-top-right rounded-2xl bg-white shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+                        className="absolute right-0 mt-2 w-48 origin-top-right rounded-2xl bg-white shadow-xl focus:outline-none z-50"
                     >
                         <div className="py-1">
                             <Link

@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function NotFound() {
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen">
+        <div className="flex flex-col items-center mt-20 min-h-screen">
             <div className="text-center p-8 md:p-16 max-w-2xl mx-auto bg-white shadow-2xl rounded-3xl border-gray-500 transform transition-all duration-500 hover:scale-105">
                 <h1 className="text-9xl font-extrabold text-indigo-600  animate-pulse">404</h1>
                 <h2 className="text-4xl font-bold mt-4 mb-4">Ой-ой! Страница не найдена.</h2>
