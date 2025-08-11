@@ -6,6 +6,7 @@ import { useDashboard } from "@/hooks/useDashboard";
 import { useUserContext } from "@/context/UserContext"; // <-- Исправлено: используем useUserContext
 import UnauthorizedMessage from "@/components/UnauthorizedMessage";
 import LoadingComp from "@/components/loadingComp";
+import ProjectDescription from "@/components/ProjectDescription";
 
 export default function Home() {
     const { selectedDashboardId } = useDashboard();
@@ -18,7 +19,12 @@ export default function Home() {
 
     if (!user) {
         // Если пользователь не авторизован (user === null), отображаем соответствующее сообщение.
-        return <UnauthorizedMessage />;
+        return (
+            <>
+                <ProjectDescription />
+                <UnauthorizedMessage />
+            </>
+            );
     }
 
     // Если пользователь авторизован, отображаем DashboardView.
