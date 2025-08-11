@@ -13,15 +13,11 @@ interface Props {
     onSuccess?: () => void;
 }
 
-// Тип данных для внутреннего состояния формы
-
-
 const TaskForm: React.FC<Props> = ({ onSuccess }) => {
     const { tasks } = useTasks();
     const { data: dashboards = [] } = useFetchDashboards();
     const { user } = useUser();
     const { users } = useUsers();
-
 
     const { createTask, loading, success, error } = useCreateTask();
 
@@ -60,11 +56,14 @@ const TaskForm: React.FC<Props> = ({ onSuccess }) => {
 
     const handleBlockedByChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const selected = Array.from(e.target.selectedOptions, (opt) => opt.value);
+
+        // НОВАЯ ОТЛАДКА: Выводим массив выбранных ID в консоль
+        console.log("Выбранные блокирующие задачи (ID):", selected);
+
         setForm((prev) => ({ ...prev, blockedBy: selected }));
     };
 
-    const handleBlockersToggle = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const isYes = e.target.value === "yes";
+    const handleBlockersToggle = (isYes: boolean) => {
         setHasBlockers(isYes);
         if (!isYes) {
             setForm((prev) => ({ ...prev, blockedBy: [] }));
@@ -74,7 +73,8 @@ const TaskForm: React.FC<Props> = ({ onSuccess }) => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // 1. Преобразование данных формы в payload для API
+        // 💡 ИСПРАВЛЕНИЕ: Создаем payload более надежным способом
+        // Мы явно проверяем, есть ли блокирующие задачи
         const payload: CreateTaskPayload = {
             title: form.title,
             description: form.description,
@@ -83,11 +83,14 @@ const TaskForm: React.FC<Props> = ({ onSuccess }) => {
             reporterID: form.reporterId,
             approveStatus: form.approveStatus,
             approverID: form.approverId,
-            blockers: form.blockedBy,
+            // Если hasBlockers === false, отправляем пустой массив
+            blockers: hasBlockers ? form.blockedBy : [],
         };
 
+        // 🚀 ОТЛАДКА: Выводим payload в консоль, чтобы проверить, что отправляется
+        console.log("Payload перед отправкой:", payload);
+
         // 2. Отправка данных через хук
-        // isMock установлен в true, чтобы имитировать запрос без реального эндпоинта
         await createTask(payload);
 
         // 3. Обработка успешного ответа
@@ -99,7 +102,7 @@ const TaskForm: React.FC<Props> = ({ onSuccess }) => {
     return (
         <form onSubmit={handleSubmit} className="p-6 w-full flex flex-col gap-6 bg-white">
             <div className="flex flex-col gap-2">
-                <label htmlFor="title" className="text-gray-700 font-medium">Название задачи</label>
+                <label htmlFor="title" className="text-2xl text-gray-700 font-bold">Название задачи</label>
                 <input
                     id="title"
                     name="title"
@@ -112,7 +115,7 @@ const TaskForm: React.FC<Props> = ({ onSuccess }) => {
             </div>
 
             <div className="flex flex-col gap-2">
-                <label htmlFor="description" className="text-gray-700 font-medium">Описание</label>
+                <label htmlFor="description" className="text-xl text-gray-700 font-bold">Описание</label>
                 <textarea
                     id="description"
                     name="description"
@@ -123,59 +126,109 @@ const TaskForm: React.FC<Props> = ({ onSuccess }) => {
                 />
             </div>
 
-            <div className="flex flex-col gap-2">
-                <label htmlFor="deadline" className="text-gray-700 font-medium">Дедлайн</label>
-                <input
-                    id="deadline"
-                    name="deadline"
-                    type="datetime-local"
-                    value={form.deadline}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-            </div>
+            <section>
+                <div className="flex gap-4 w-full">
+                    <div className="flex flex-col gap-2 w-full">
+                        <label htmlFor="deadline" className="text-xl text-gray-700 font-bold">Дедлайн</label>
+                        <input
+                            id="deadline"
+                            name="deadline"
+                            type="datetime-local"
+                            value={form.deadline}
+                            onChange={handleChange}
+                            required
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 h-12"
+                        />
+                    </div>
+                    <div className="flex flex-col gap-2 w-full">
+                        <label htmlFor="dashboardId" className="text-xl text-gray-700 font-bold">Дашборд</label>
+                        <select
+                            id="dashboardId"
+                            name="dashboardId"
+                            value={form.dashboardId}
+                            onChange={handleChange}
+                            required
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 h-12"
+                        >
+                            <option value="" disabled>Выберите дашборд</option>
+                            {dashboards
+                                .filter((db) => db.id !== 'all')
+                                .map((db) => (
+                                    <option key={db.id} value={db.id}>{db.name}</option>
+                                ))}
+                        </select>
+                    </div>
 
-            <div className="flex flex-col gap-2">
-                <label htmlFor="dashboardId" className="text-gray-700 font-medium">Дашборд</label>
-                <select
-                    id="dashboardId"
-                    name="dashboardId"
-                    value={form.dashboardId}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                    <option value="" disabled>Выберите дашборд</option>
-                    {dashboards
-                        .filter((db) => db.id !== 'all')
-                        .map((db) => (
-                            <option key={db.id} value={db.id}>{db.name}</option>
-                        ))}
-                </select>
-            </div>
+                </div>
+            </section>
 
-            <div className="flex flex-col gap-2">
-                <label htmlFor="requireApproval" className="text-gray-700 font-medium">Требуется согласование?</label>
-                <select
-                    id="requireApproval"
-                    value={form.approveStatus === "need-approval" ? "yes" : "no"}
-                    onChange={(e) => {
-                        setForm((prev) => ({
-                            ...prev,
-                            approveStatus: e.target.value === "yes" ? "need-approval" : "approved",
-                        }));
-                    }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                    <option value="yes">Да</option>
-                    <option value="no">Нет</option>
-                </select>
-            </div>
+            <section className="flex gap-4 justify-between">
+                {/* Секция для "Требуется согласование?" */}
+                <div className="flex flex-col gap-2">
+                    <label className="text-medium text-gray-700 font-medium">Требуется согласование?</label>
+                    <div className="flex gap-4">
+                        {/* Радио-кнопка "Да" */}
+                        <div className="flex items-center gap-2">
+                            <input
+                                id="require-yes"
+                                name="requireApproval"
+                                type="radio"
+                                checked={form.approveStatus === "need-approval"}
+                                onChange={() => setForm(prev => ({ ...prev, approveStatus: "need-approval" }))}
+                                className="h-6 w-6 text-indigo-600 bg-gray-100 border-gray-300 focus:ring-indigo-500 cursor-pointer"
+                            />
+                            <label htmlFor="require-yes" className="text-medium text-gray-700 font-medium cursor-pointer">Да</label>
+                        </div>
+                        {/* Радио-кнопка "Нет" */}
+                        <div className="flex items-center gap-2">
+                            <input
+                                id="require-no"
+                                name="requireApproval"
+                                type="radio"
+                                checked={form.approveStatus === "approved"}
+                                onChange={() => setForm(prev => ({ ...prev, approveStatus: "approved" }))}
+                                className="h-6 w-6 text-indigo-600 bg-gray-100 border-gray-300 focus:ring-indigo-500 cursor-pointer"
+                            />
+                            <label htmlFor="require-no" className="text-medium text-gray-700 font-medium cursor-pointer">Нет</label>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Секция для "Есть блокирующие задачи?" */}
+                <div className="flex flex-col gap-2">
+                    <label className="text-medium text-gray-700 font-medium">Есть блокирующие задачи?</label>
+                    <div className="flex gap-4">
+                        {/* Радио-кнопка "Да" */}
+                        <div className="flex items-center gap-2">
+                            <input
+                                id="blockers-yes"
+                                name="hasBlockers"
+                                type="radio"
+                                checked={hasBlockers}
+                                onChange={() => handleBlockersToggle(true)}
+                                className="h-6 w-6 text-indigo-600 bg-gray-100 border-gray-300 focus:ring-indigo-500 cursor-pointer"
+                            />
+                            <label htmlFor="blockers-yes" className="text-medium text-gray-700 font-medium cursor-pointer">Да</label>
+                        </div>
+                        {/* Радио-кнопка "Нет" */}
+                        <div className="flex items-center gap-2">
+                            <input
+                                id="blockers-no"
+                                name="hasBlockers"
+                                type="radio"
+                                checked={!hasBlockers}
+                                onChange={() => handleBlockersToggle(false)}
+                                className="h-6 w-6 text-indigo-600 bg-gray-100 border-gray-300 focus:ring-indigo-500 cursor-pointer"
+                            />
+                            <label htmlFor="blockers-no" className="text-medium text-gray-700 font-medium cursor-pointer">Нет</label>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
             {form.approveStatus === "need-approval" && (
                 <div className="flex flex-col gap-2">
-                    <label htmlFor="approverId" className="text-gray-700 font-medium">Утверждающий</label>
+                    <label htmlFor="approverId" className="text-xl text-gray-700 font-medium">Утверждающий:</label>
                     <select
                         id="approverId"
                         name="approverId"
@@ -194,22 +247,9 @@ const TaskForm: React.FC<Props> = ({ onSuccess }) => {
                 </div>
             )}
 
-            <div className="flex flex-col gap-2">
-                <label htmlFor="hasBlockers" className="text-gray-700 font-medium">Есть блокирующие задачи?</label>
-                <select
-                    id="hasBlockers"
-                    value={hasBlockers ? "yes" : "no"}
-                    onChange={handleBlockersToggle}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                    <option value="no">Нет</option>
-                    <option value="yes">Да</option>
-                </select>
-            </div>
-
             {hasBlockers && (
                 <div className="flex flex-col gap-2">
-                    <label htmlFor="blockedBy" className="text-gray-700 font-medium">Блокирующие задачи</label>
+                    <label htmlFor="blockedBy" className="text-xl text-gray-700 font-medium">Блокирующие задачи</label>
                     <select
                         id="blockedBy"
                         name="blockedBy"

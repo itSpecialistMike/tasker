@@ -3,7 +3,8 @@
 
 import ProfileButton from "./ProfileButton"; // Импортируем компонент кнопки профиля.
 import { useDashboard } from "@/hooks/useDashboard"; // Импортируем кастомный хук для работы с дашбордами.
-import { useRouter } from "next/navigation"; // Импортируем хук для навигации.
+import { useRouter } from "next/navigation";
+import LoadingComp from "@/components/loadingComp"; // Импортируем хук для навигации.
 
 // Определяем тип пропсов для компонента NavMobile.
 type Props = {
@@ -36,7 +37,7 @@ const NavMobile: React.FC<Props> = ({ onClose }) => {
 
     // Если список дашбордов ещё не загружен, показываем индикатор загрузки.
     if (!dashboards.length) {
-        return <div>Загрузка дашбордов...</div>;
+        return <LoadingComp />;
     }
 
     // Рендерим мобильное меню.

@@ -161,7 +161,7 @@ const ProjectDescription: React.FC = () => {
                     <div className="md:flex gap-8">
                         <Image
                             src={fabric}
-                            className="hidden md:block h-[300px] pt-6 rounded-3xl border shadow-lg"
+                            className="hidden md:block h-[300px] pt-6 rounded-3xl border border-gray-500 shadow-lg"
                             alt="CI/CD pipeline"
                             width={500} // Укажите ширину и высоту для оптимизации
                             height={300}

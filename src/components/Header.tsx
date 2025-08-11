@@ -30,6 +30,19 @@ const Header: React.FC = () => {
                 <>
                     {/** Навигация для десктопной версии */}
                     <NavDesktop />
+
+                    {/** Кнопка меню для мобильной версии */}
+                    <button
+                        className="md:hidden flex items-center"
+                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                    >
+                        {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                    </button>
+
+                    {/** Мобильное меню при открытии */}
+                    {mobileMenuOpen && (
+                        <NavMobile onClose={() => setMobileMenuOpen(false)} />
+                    )}
                 </>
             )}
 
@@ -38,18 +51,7 @@ const Header: React.FC = () => {
                 <ProfileButton/>
             </div>
 
-            {/** Кнопка меню для мобильной версии */}
-            <button
-                className="md:hidden flex items-center"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-                {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
 
-            {/** Мобильное меню при открытии */}
-            {mobileMenuOpen && (
-                <NavMobile onClose={() => setMobileMenuOpen(false)} />
-            )}
         </header>
     );
 };

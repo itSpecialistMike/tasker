@@ -19,11 +19,11 @@ const ProfileButton = () => {
     const queryClient = useQueryClient();
     const router = useRouter();
 
-    // 💡 Исправлено: вызываем useTasks с опцией { enabled: false }
+    // Исправлено: вызываем useTasks с опцией { enabled: false }
     // Это предотвратит автоматический запрос, но даст доступ к refetch.
     const { refetch: refetchTasks } = useTasks({ enabled: false });
 
-    // 💡 Корректное получение функции refetch из хука useDashboard
+    // Корректное получение функции refetch из хука useDashboard
     const { refetchDashboards } = useDashboard();
 
     const handleClose = () => setIsOpen(false);
@@ -31,14 +31,8 @@ const ProfileButton = () => {
     const handleLogout = async () => {
         try {
             await logout();
-
             queryClient.setQueryData(["currentUser"], null);
-
-            // Вызываем refetch. Благодаря опции 'enabled' в хуках,
-            // запросы на сервер не будут выполнены, так как user будет null.
             await router.push("/");
-
-
             handleClose();
         } catch (error) {
             console.error("Ошибка при выходе из системы", error);
@@ -54,14 +48,14 @@ const ProfileButton = () => {
             <div className="relative inline-block text-left">
                 <button
                     onClick={() => setIsOpen(!isOpen)}
-                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-900 text-white hover:bg-indigo-700 transition-colors transform duration-300"
+                    className="flex items-center gap-2 px-4 h-[48px] py-2 rounded-full bg-indigo-900 text-white hover:bg-indigo-700 transition-colors transform duration-300"
                     aria-haspopup="true"
                     aria-expanded={isOpen}
                 >
                     <span className="font-bold hidden sm:inline">
                         Привет, {user.login}
                     </span>
-                    <UserIcon size={18} />
+                    <UserIcon size={20} />
                 </button>
                 <AnimatePresence>
                     {isOpen && (
@@ -105,10 +99,10 @@ const ProfileButton = () => {
     }
 
     return (
-        <div className="relative inline-block text-left">
+        <div className="relative inline-block text-left ">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-900 text-white hover:bg-indigo-700 transition-colors transform duration-300"
+                className="flex items-center gap-2 px-4 h-[48px] py-2 rounded-full bg-indigo-900 text-white hover:bg-indigo-700 transition-colors transform duration-300"
                 aria-haspopup="true"
                 aria-expanded={isOpen}
             >
