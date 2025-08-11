@@ -10,6 +10,7 @@ import { useTasksByDB } from "@/hooks/UseTasksByDB";
 import { useSortedTasks } from "@/hooks/useSortedTasks";
 // useFetchDashboards: хук для получения списка всех дашбордов.
 import { useFetchDashboards } from "@/hooks/useFetchDashboards";
+import LoadingComp from "@/components/loadingComp";
 
 // Определение типа для пропсов компонента DashboardView.
 // dashboardId: опциональный пропс, который может быть строкой.
@@ -64,20 +65,20 @@ const DashboardView: React.FC<Props> = ({ dashboardId }) => {
 
   // Обработка состояния загрузки.
   // Если загружаются дашборды или задачи, показываем индикатор загрузки.
-  if (dashboardsLoading || tasksLoading) {
-    return <div className="p-4 text-gray-500">Загрузка...</div>;
+  if (dashboardsLoading || tasksLoading || tasksError || dashboardsError) {
+    return <LoadingComp />;
   }
 
   // Обработка состояния ошибки.
   // Если произошла ошибка при загрузке дашбордов, отображаем соответствующее сообщение.
-  if (dashboardsError) {
-    return <div className="p-4 text-red-500">Ошибка загрузки дашбордов: {dashboardsError.message}</div>;
-  }
-
-  // Если произошла ошибка при загрузке задач, отображаем соответствующее сообщение.
-  if (tasksError) {
-    return <div className="p-4 text-red-500">Ошибка загрузки задач: {tasksError}</div>;
-  }
+  // if (dashboardsError) {
+  //   return <div className="p-4 text-red-500">Ошибка загрузки дашбордов: {dashboardsError.message}</div>;
+  // }
+  //
+  // // Если произошла ошибка при загрузке задач, отображаем соответствующее сообщение.
+  // if (tasksError) {
+  //   return <div className="p-4 text-red-500">Ошибка загрузки задач: {tasksError}</div>;
+  // }
 
   // Определение заголовка таблицы.
   // Находим дашборд по ID и используем его имя. Если дашборд не найден, используем "Дашборд" по умолчанию.

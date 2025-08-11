@@ -7,7 +7,7 @@ import Logo from "./HeaderParts/Logo";
 import NavDesktop from "./HeaderParts/NavDesktop";
 import NavMobile from "./HeaderParts/NavMobile";
 import ProfileButton from "./HeaderParts/ProfileButton";
-import { useUser } from "@/hooks/useUser";// ✔️ Импортируем хук useUser
+import { useUserContext } from "@/context/UserContext"; // <-- Импортируем хук
 
 /**
  * Компонент Header:
@@ -17,13 +17,21 @@ import { useUser } from "@/hooks/useUser";// ✔️ Импортируем ху�
 const Header: React.FC = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+    // Получаем данные пользователя и статус загрузки из контекста
+    const { user } = useUserContext();
+
     return (
         <header className="w-full bg-white shadow-xl border border-gray-200 px-4 sm:px-6 md:px-10 lg:px-100 py-4 flex items-center justify-between relative">
             {/** Логотип */}
             <Logo />
 
-            {/** Навигация для десктопной версии */}
-            <NavDesktop />
+            {/* Логика условного рендеринга навигации */}
+            {user && ( // <-- Рендерим навигацию только если пользователь авторизован
+                <>
+                    {/** Навигация для десктопной версии */}
+                    <NavDesktop />
+                </>
+            )}
 
             {/** Блок профиля (показывается только на десктопе) */}
             <div className="hidden md:flex items-center space-x-4">
