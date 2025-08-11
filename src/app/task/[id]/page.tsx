@@ -1,4 +1,4 @@
-// tasker/src/app/task/[id]/page.tsx
+// tasker/src/app/task/[id]/page.tsx.tsx
 'use client';
 
 import { useParams } from 'next/navigation';
