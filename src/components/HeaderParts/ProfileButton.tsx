@@ -68,7 +68,7 @@ const ProfileButton = () => {
                         >
                             <div className="py-2 px-4 border-b border-gray-100">
                                 <p className="text-sm font-medium text-gray-900">
-                                    {user.name} {user.surname} {user.middlename}
+                                    {user.surname} {user.name} {user.middlename}
                                 </p>
                                 <p className="text-xs text-gray-500">
                                     @{user.login}
